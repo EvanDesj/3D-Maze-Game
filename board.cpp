@@ -39,7 +39,7 @@ void Board::draw() {
         for(int j = 0; j < this->cols; j++) {
             if (this->vect[i][j] == 1) {
                 glPushMatrix();
-                glTranslatef(i, 0, j);
+                glTranslatef(i - 2, 0, j - 2);
                 glutSolidCube(1);
                 glPopMatrix();
             }
