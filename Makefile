@@ -29,8 +29,9 @@ PROGRAM_NAME= main
 run: $(PROGRAM_NAME)
 	./$(PROGRAM_NAME)$(EXEEXT)
 
-$(PROGRAM_NAME): main.o
-	$(CCX) -o $@ $^ $(CFLAGS) $(LDFLAGS)
+$(PROGRAM_NAME): main.o board.o
+	$(CCX) -o $@ $^ $(LIBRARIES) $(CFLAGS) $(LDFLAGS)
+>>>>>>> Stashed changes
 
 clean:
 	$(RM) *.o $(PROGRAM_NAME)$(EXEEXT)

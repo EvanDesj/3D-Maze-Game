@@ -25,6 +25,9 @@ Final Project:
 #include <iostream>
 #include <cmath>
 #include <list>
+#include <vector>
+#include "camera.h"
+#include "board.h"
 
 // Define GLUT Constants
 #define WINDOW_TITLE "3GC3 Final Project"
@@ -33,12 +36,33 @@ int timerFunc = 20;
 int windowWidth = 800;
 int windowHeight = 600;
 
+std::vector<std::vector <int>> board
+{
+    {1,1,1,1,1},
+    {0,0,1,0,0},
+    {1,0,1,0,1},
+    {1,0,0,0,1},
+    {1,1,1,1,1}
+};
+
+CameraSystem camera = CameraSystem();
+Board gameBoard = Board(board);
+
 // Display Callback Function
 void display()
 {
     // Clear and prepare
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    gluLookAt(camera.getX(), camera.getY(), camera.getZ(), 0, 0, 0, camera.rotX, camera.rotY, camera.rotZ);
+    glColor3f(1, 1, 1);
 
+    // glPushMatrix();
+    // glScalef(10, 1, 10);
+    // glutSolidCube(1);
+    // glPopMatrix();
+    gameBoard.draw();
     // Swap Buffers
     glutSwapBuffers();
 };
