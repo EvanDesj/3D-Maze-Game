@@ -39,62 +39,6 @@ int windowHeight = 600;
 CameraSystem camera = CameraSystem();
 Board gameBoard = Board(Vec3D(0,0,0), 5);
 
-
-// Top-level event handler
-void eventCommandHandler(int value)
-{
-    switch (value)
-    {
-    case 0:
-        exit(0);
-        break;
-    case 1:
-        camera.zoomIn();
-        break;
-    case 2:
-        camera.zoomOut();
-        break;
-    case 3:
-        camera.moveLeft();
-        break;
-    case 4:
-        camera.moveRight();
-        break;
-    //reset with r
-    case 5:
-        camera.reset();
-        break;
-    case 6:
-        camera.cameraUp();
-        break;
-    case 7:
-        camera.cameraDown();
-        break;
-    case 8:
-        camera.tiltLeft();
-        break;
-    case 9:
-        camera.tiltRight();
-        break;
-    //move board with t,f,g,h
-    case 10:
-        gameBoard.rotate(Vec3D(1,0,0));
-        break;
-    case 11:
-        gameBoard.rotate(Vec3D(0,0,1));
-        break;
-    case 12:
-        gameBoard.rotate(Vec3D(-1,0,0));
-        break;
-    case 13:
-        gameBoard.rotate(Vec3D(0,0,-1));
-        break;
-    default:
-        break;
-    }
-};
-
-
 // Display Callback Function
 void display()
 {
@@ -143,43 +87,43 @@ void keyboard(unsigned char key, int x, int y)
     case 27:
     case 'q':
     case 'Q':
-        eventCommandHandler(0);
+        exit(0);
         break;
     case 'w':
     case 'W':
-        eventCommandHandler(1);
+        camera.zoomIn();
         break;
     case 's':
     case 'S':
-        eventCommandHandler(2);
+        camera.zoomOut();
         break;
     case 'a':
     case 'A':
-        eventCommandHandler(3);
+        camera.moveLeft();
         break;
     case 'd':
     case 'D':
-        eventCommandHandler(4);
+        camera.moveRight();
         break;
     case 'r':
     case 'R':
-        eventCommandHandler(5);
+        camera.reset();
         break;
     case 't':
     case 'T':
-        eventCommandHandler(10);
+        gameBoard.rotate(Vec3D(1,0,0));
         break;
     case 'f':
     case 'F':
-        eventCommandHandler(11);
+        gameBoard.rotate(Vec3D(0,0,1));
         break;
     case 'g':
     case 'G':
-        eventCommandHandler(12);
+        gameBoard.rotate(Vec3D(-1,0,0));
         break;
     case 'h':
     case 'H':
-        eventCommandHandler(13);
+        gameBoard.rotate(Vec3D(0,0,-1));
         break;
     default:
         break;
@@ -193,16 +137,16 @@ void specialKeyboard(int key, int x, int y)
     switch (key)
     {
     case GLUT_KEY_UP:
-        eventCommandHandler(6);
+        camera.cameraUp();
         break;
     case GLUT_KEY_DOWN:
-        eventCommandHandler(7);
+        camera.cameraDown();
         break;
     case GLUT_KEY_LEFT:
-        eventCommandHandler(8);
+        camera.tiltLeft();
         break;
     case GLUT_KEY_RIGHT:
-        eventCommandHandler(9);
+        camera.tiltRight();
         break;
     default:
         break;
