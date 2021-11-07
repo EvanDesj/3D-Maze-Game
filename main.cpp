@@ -154,13 +154,6 @@ void specialKeyboard(int key, int x, int y)
     glutPostRedisplay();
 };
 
-// Menu Callback Function
-void menu(int value)
-{
-    eventCommandHandler(value);
-    glutPostRedisplay();
-};
-
 // Glut Initialization Function
 void init()
 {
