@@ -29,7 +29,7 @@ PROGRAM_NAME= main
 run: $(PROGRAM_NAME)
 	./$(PROGRAM_NAME)$(EXEEXT)
 
-$(PROGRAM_NAME): main.o board.o
+$(PROGRAM_NAME): main.o board.o camera.o
 	$(CCX) -o $@ $^ $(LIBRARIES) $(CFLAGS) $(LDFLAGS)
 
 clean:

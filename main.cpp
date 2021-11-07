@@ -52,6 +52,7 @@ Board gameBoard = Board(board);
 void display()
 {
     // Clear and prepare
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -62,7 +63,9 @@ void display()
     // glScalef(10, 1, 10);
     // glutSolidCube(1);
     // glPopMatrix();
+
     gameBoard.draw();
+
     // Swap Buffers
     glutSwapBuffers();
 };
@@ -90,8 +93,29 @@ void keyboard(unsigned char key, int x, int y)
 {
     switch (key)
     {
-    case 'q': case 'Q':
+    case 'q':
+    case 'Q':
         exit(0);
+        break;
+    case 'w':
+    case 'W':
+        camera.zoomIn();
+        break;
+    case 's':
+    case 'S':
+        camera.zoomOut();
+        break;
+    case 'a':
+    case 'A':
+        camera.moveLeft();
+        break;
+    case 'd':
+    case 'D':
+        camera.moveRight();
+        break;
+    case 'r':
+    case 'R':
+        camera.reset();
         break;
     default:
         break;
@@ -104,6 +128,18 @@ void specialKeyboard(int key, int x, int y)
 {
     switch (key)
     {
+    case GLUT_KEY_UP:
+        camera.cameraUp();
+        break;
+    case GLUT_KEY_DOWN:
+        camera.cameraDown();
+        break;
+    case GLUT_KEY_LEFT:
+        camera.tiltLeft();
+        break;
+    case GLUT_KEY_RIGHT:
+        camera.tiltRight();
+        break;
     default:
         break;
     }
@@ -132,17 +168,12 @@ void mousePassiveMotion(int x, int y)
 // Glut Initialization Function
 void init()
 {
-    // Prepare the window
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-    glutInitWindowSize(windowWidth, windowHeight);
-    glutCreateWindow(WINDOW_TITLE);
-    // Set background colour
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    // Set up the viewport
-    glViewport(0, 0, windowWidth, windowHeight);
-    // Set up the projection matrix
+    glClearColor(0.5, 0.5, 0.5, 0);
+    glColor3f(1, 1, 1);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
+    //glOrtho(-2, 2, -2, 2, -2, 2);
+    gluPerspective(45, 1, 1, 100);
 };
 
 // Print Program Instructions
@@ -155,29 +186,28 @@ void printInstructions()
 // Main program
 int main(int argc, char **argv)
 {
-    // Initialize GLUT
-    glutInit(&argc, argv);
-    // Initialize the window
-    init();
-    
-    // Bind callbacks
-    glutDisplayFunc(display);
-    glutReshapeFunc(reshape);
-    glutKeyboardFunc(keyboard);
-    glutSpecialFunc(specialKeyboard);
-    glutMouseFunc(mouse);
-    glutMotionFunc(mouseMotion);
-    glutPassiveMotionFunc(mousePassiveMotion);
+    glutInit(&argc, argv); //starts up GLUT
 
-    // Animate function
-    glutTimerFunc(timerFunc, animate, 0);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 
-    // Set-Up 3D
+    glutInitWindowSize(800, 800);
+    glutInitWindowPosition(100, 100);
+
+    glutCreateWindow("Labyrinth");  //creates the window
+
+    glutDisplayFunc(display);           //registers "display" as the display callback function
+    glutKeyboardFunc(keyboard);         //registers "keyboard" as the keyboard callback function
+    glutSpecialFunc(specialKeyboard);   //registers "specialKeyboard" as the special callback function
+
+    //Set up efficient 3D
     glEnable(GL_DEPTH_TEST);
     glFrontFace(GL_CW);
     glCullFace(GL_FRONT);
     glEnable(GL_CULL_FACE);
-    
-    // Start the main loop
-    glutMainLoop();
+
+    init();
+
+    glutMainLoop(); //starts the event loop
+
+    return (0);
 };

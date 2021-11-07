@@ -14,9 +14,10 @@
 #endif
 
 #include "board.h"
+#include "shape.h"
 #include <vector>
 
-Board::Board(std::vector<std::vector <int>> vect) {
+Board::Board(std::vector<std::vector <Shape>> vect) {
     this->vect = vect;
     this->rows = vect.size();
     this->cols = vect[0].size();
@@ -42,6 +43,16 @@ void Board::draw() {
                 glTranslatef(i - 2, 0, j - 2);
                 glutSolidCube(1);
                 glPopMatrix();
+            }
+        }
+    }
+}
+
+void Board::update(Vector3 tilt){
+    for(int i = 0; i < this->rows; i++) {
+        for(int j = 0; j < this->cols; j++) {
+            if (this->vect[i][j] != Shape::Empty) {
+
             }
         }
     }
