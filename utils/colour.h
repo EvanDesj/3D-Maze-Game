@@ -4,14 +4,15 @@
 class Colour {
 public:
 
-    float mR;
-    float mG;
-    float mB;
-    float mA;
+    float r;
+    float g;
+    float b;
+    float a;
 
     Colour();
     Colour(float r, float g, float b, float a);
     void setColour(float r, float g, float b, float a);
+    float* getColour();
     bool isColour(Colour other);
 };
 

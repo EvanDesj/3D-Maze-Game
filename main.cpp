@@ -36,17 +36,8 @@ int timerFunc = 20;
 int windowWidth = 800;
 int windowHeight = 600;
 
-std::vector<std::vector <int>> board
-{
-    {1,1,1,1,1},
-    {0,0,1,0,0},
-    {1,0,1,0,1},
-    {1,0,0,0,1},
-    {1,1,1,1,1}
-};
-
 CameraSystem camera = CameraSystem();
-Board gameBoard = Board(board);
+Board gameBoard = Board(Vec3D(0,0,0), 3);
 
 // Display Callback Function
 void display()
@@ -117,6 +108,22 @@ void keyboard(unsigned char key, int x, int y)
     case 'R':
         camera.reset();
         break;
+    case 't':
+    case 'T':
+        gameBoard.rotate(Vec3D(1,0,0));
+        break;
+    case 'f':
+    case 'F':
+        gameBoard.rotate(Vec3D(0,0,1));
+        break;
+    case 'g':
+    case 'G':
+        gameBoard.rotate(Vec3D(-1,0,0));
+        break;
+    case 'h':
+    case 'H':
+        gameBoard.rotate(Vec3D(0,0,-1));
+        break;
     default:
         break;
     }
@@ -174,6 +181,7 @@ void init()
     glLoadIdentity();
     //glOrtho(-2, 2, -2, 2, -2, 2);
     gluPerspective(45, 1, 1, 100);
+
 };
 
 // Print Program Instructions

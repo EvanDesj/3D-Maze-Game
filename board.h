@@ -3,20 +3,19 @@
 
 //include required libraries
 #include <vector>
+#include "./shapes/cube.h"
 
 class Board
 {
-private:
-    int rows;
-    int cols;
-    std::vector<std::vector <int>> vect;
-
 public:
-    Board(std::vector<std::vector <int>> vect);
-    // void tiltX();
-    // void tiltY();
-    // void tiltZ();
+
+    Vec3D center;
+    int size;
+    std::vector<std::vector<Cube>> board;
+
+    Board(Vec3D center, int size);
     void draw();
+    void rotate(Vec3D rotate);
 };
 
 #endif

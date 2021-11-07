@@ -29,7 +29,7 @@ PROGRAM_NAME= main
 run: $(PROGRAM_NAME)
 	./$(PROGRAM_NAME)$(EXEEXT)
 
-$(PROGRAM_NAME): main.o board.o camera.o
+$(PROGRAM_NAME): main.o board.o camera.o shapes/shape.o shapes/cube.o utils/colour.o utils/material.o utils/mathLib3D.o
 	$(CCX) -o $@ $^ $(LIBRARIES) $(CFLAGS) $(LDFLAGS)
 
 clean:
