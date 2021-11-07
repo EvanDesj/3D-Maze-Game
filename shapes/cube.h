@@ -12,7 +12,7 @@ class Cube : public Shape
 public:
     Vec3D center;
     Vec3D size;
-    Vec3D rotation;
+    Vec3D rotationAngle;
     Colour colour;
     Material material;
 

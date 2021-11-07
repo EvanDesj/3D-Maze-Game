@@ -18,6 +18,7 @@
 #include "./shapes/cube.h"
 #include <vector>
 #include <math.h>
+#include <iostream>
 
 Board::Board(Vec3D center, int size) {
     this->center = center;
@@ -26,14 +27,15 @@ Board::Board(Vec3D center, int size) {
     //create the gameboard
     std::vector<std::vector<Cube>>board;
 
-    //boards that have even length and width do not have a center cube, meaning much more camera math and board math
+    //boards that have even length and width (like 8x8) do not have a center cube, meaning more camera and board math
     //may not allow that type of board to exist, but this works for now.
-    //float indexLimit = (this->size - 1) / 2;
+    float indexLimit = ((this->size - 1) / 2.0f);
 
-    for (int i = -2; i <= 2; i++) {
+    //i is the x pos of a cube, j is the z pos
+    for (int i = (int)(ceil(indexLimit)*-1); i <= (int)(floor(indexLimit)); i++) {
         std::vector<Cube> row;
-        for (int j = -2; j <= 2; j++) {
-            row.push_back( Cube(Vec3D(i, 0.0f, j),
+        for (int j = (int)(ceil(indexLimit)*-1); j <= (int)(floor(indexLimit)); j++) {
+            row.push_back( Cube(Vec3D(i + this->center.x, 0.0f, j + this->center.y),
                                 Vec3D(1.0f, 1.0f, 1.0f),
                                 Vec3D(0.0f, 0.0f, 0.0f),
                                 Colour(0.36f, 0.27f, 0.54f, 1.0f),
@@ -59,8 +61,8 @@ void Board::draw() {
 
 void Board::rotate(Vec3D rotate){
     //float indexLimit = (this->size - 1) / 2;
-    for (int i = -2; i <= 2; i++) {
-        for (int j = -2; j <= 2; j++) {
+    for (int i = 0; i < this->size; i++) {
+        for (int j = 0; j < this->size; j++) {
             this->board[i][j].rotationAngle = this->board[i][j].rotationAngle.add(rotate);
         }
     }

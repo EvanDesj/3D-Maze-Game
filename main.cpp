@@ -39,6 +39,62 @@ int windowHeight = 600;
 CameraSystem camera = CameraSystem();
 Board gameBoard = Board(Vec3D(0,0,0), 5);
 
+
+// Top-level event handler
+void eventCommandHandler(int value)
+{
+    switch (value)
+    {
+    case 0:
+        exit(0);
+        break;
+    case 1:
+        camera.zoomIn();
+        break;
+    case 2:
+        camera.zoomOut();
+        break;
+    case 3:
+        camera.moveLeft();
+        break;
+    case 4:
+        camera.moveRight();
+        break;
+    //reset with r
+    case 5:
+        camera.reset();
+        break;
+    case 6:
+        camera.cameraUp();
+        break;
+    case 7:
+        camera.cameraDown();
+        break;
+    case 8:
+        camera.tiltLeft();
+        break;
+    case 9:
+        camera.tiltRight();
+        break;
+    //move board with t,f,g,h
+    case 10:
+        gameBoard.rotate(Vec3D(1,0,0));
+        break;
+    case 11:
+        gameBoard.rotate(Vec3D(0,0,1));
+        break;
+    case 12:
+        gameBoard.rotate(Vec3D(-1,0,0));
+        break;
+    case 13:
+        gameBoard.rotate(Vec3D(0,0,-1));
+        break;
+    default:
+        break;
+    }
+};
+
+
 // Display Callback Function
 void display()
 {
@@ -84,45 +140,46 @@ void keyboard(unsigned char key, int x, int y)
 {
     switch (key)
     {
+    case 27:
     case 'q':
     case 'Q':
-        exit(0);
+        eventCommandHandler(0);
         break;
     case 'w':
     case 'W':
-        camera.zoomIn();
+        eventCommandHandler(1);
         break;
     case 's':
     case 'S':
-        camera.zoomOut();
+        eventCommandHandler(2);
         break;
     case 'a':
     case 'A':
-        camera.moveLeft();
+        eventCommandHandler(3);
         break;
     case 'd':
     case 'D':
-        camera.moveRight();
+        eventCommandHandler(4);
         break;
     case 'r':
     case 'R':
-        camera.reset();
+        eventCommandHandler(5);
         break;
     case 't':
     case 'T':
-        gameBoard.rotate(Vec3D(1,0,0));
+        eventCommandHandler(10);
         break;
     case 'f':
     case 'F':
-        gameBoard.rotate(Vec3D(0,0,1));
+        eventCommandHandler(11);
         break;
     case 'g':
     case 'G':
-        gameBoard.rotate(Vec3D(-1,0,0));
+        eventCommandHandler(12);
         break;
     case 'h':
     case 'H':
-        gameBoard.rotate(Vec3D(0,0,-1));
+        eventCommandHandler(13);
         break;
     default:
         break;
@@ -136,16 +193,16 @@ void specialKeyboard(int key, int x, int y)
     switch (key)
     {
     case GLUT_KEY_UP:
-        camera.cameraUp();
+        eventCommandHandler(6);
         break;
     case GLUT_KEY_DOWN:
-        camera.cameraDown();
+        eventCommandHandler(7);
         break;
     case GLUT_KEY_LEFT:
-        camera.tiltLeft();
+        eventCommandHandler(8);
         break;
     case GLUT_KEY_RIGHT:
-        camera.tiltRight();
+        eventCommandHandler(9);
         break;
     default:
         break;
@@ -153,23 +210,11 @@ void specialKeyboard(int key, int x, int y)
     glutPostRedisplay();
 };
 
-// Mouse Callback Function
-void mouse(int button, int state, int x, int y)
+// Menu Callback Function
+void menu(int value)
 {
-    y = windowHeight - y;
+    eventCommandHandler(value);
     glutPostRedisplay();
-};
-
-// Mouse Motion Callback Function
-void mouseMotion(int x, int y)
-{
-    y = windowHeight - y;
-};
-
-// Mouse Passive Motion Callback Function
-void mousePassiveMotion(int x, int y)
-{
-    y = windowHeight - y;
 };
 
 // Glut Initialization Function
