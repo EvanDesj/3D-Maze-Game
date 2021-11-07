@@ -30,9 +30,9 @@ Board::Board(Vec3D center, int size) {
     //may not allow that type of board to exist, but this works for now.
     //float indexLimit = (this->size - 1) / 2;
 
-    for (int i = -2; i < 2; i++) {
+    for (int i = -2; i <= 2; i++) {
         std::vector<Cube> row;
-        for (int j = -2; j < 2; j++) {
+        for (int j = -2; j <= 2; j++) {
             row.push_back( Cube(Vec3D(i, 0.0f, j),
                                 Vec3D(1.0f, 1.0f, 1.0f),
                                 Vec3D(0.0f, 0.0f, 0.0f),

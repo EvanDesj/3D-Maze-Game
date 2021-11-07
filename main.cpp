@@ -37,7 +37,7 @@ int windowWidth = 800;
 int windowHeight = 600;
 
 CameraSystem camera = CameraSystem();
-Board gameBoard = Board(Vec3D(0,0,0), 3);
+Board gameBoard = Board(Vec3D(0,0,0), 5);
 
 // Display Callback Function
 void display()
