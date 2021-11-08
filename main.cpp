@@ -32,6 +32,12 @@ Final Project:
 // Define GLUT Constants
 #define WINDOW_TITLE "3GC3 Final Project"
 
+// Global variables for gameboard rotation increments 
+float xIncr = 0;
+float yIncr = 0;
+float zIncr = 0;
+// ------------------------//
+
 int timerFunc = 20;
 int windowWidth = 800;
 int windowHeight = 600;
@@ -39,23 +45,46 @@ int windowHeight = 600;
 CameraSystem camera = CameraSystem();
 Board gameBoard = Board(Vec3D(0,0,0), 5);
 
+// Draw axis on board (for debugging help)
+void drawAxis(){
+    glPushMatrix(); 
+    glLineWidth(2);
+    glBegin(GL_LINES);
+
+    glColor3f (1.0, 0.0, 0.0);
+    glVertex3f(0.0, 0.0, 0.0);
+    glVertex3f(10.0, 0.0, 0.0);
+
+    glColor3f (1.0, 1.0, 0.0);
+    glVertex3f(0.0, 0.0, 0.0);
+    glVertex3f(0.0, 10.0, 0.0);
+
+    glColor3f (0.0, 0.0, 1.0);
+    glVertex3f(0.0, 0.0, 0.0);
+    glVertex3f(0.0, 0.0, 10.0);
+    glEnd();
+    glPopMatrix();
+}
+
 // Display Callback Function
 void display()
 {
     // Clear and prepare
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(camera.getX(), camera.getY(), camera.getZ(), 0, 0, 0, camera.rotX, camera.rotY, camera.rotZ);
     glColor3f(1, 1, 1);
+    
+    //drawAxis(); <-- Helps to debug movement issues
 
-    // glPushMatrix();
-    // glScalef(10, 1, 10);
-    // glutSolidCube(1);
-    // glPopMatrix();
-
+    // Gameboard rotation code
+    glPushMatrix();
+    glRotatef(0+xIncr, 1, 0, 0);
+    glRotatef(0+yIncr, 0, 1, 0);
+    glRotatef(0+zIncr, 0, 0, 1);
     gameBoard.draw();
+    glPopMatrix();
 
     // Swap Buffers
     glutSwapBuffers();
@@ -64,7 +93,6 @@ void display()
 // Animate Callback Function
 void animate(int v)
 {
-
     // Redraw
     glutPostRedisplay();
 
@@ -108,6 +136,10 @@ void keyboard(unsigned char key, int x, int y)
     case 'r':
     case 'R':
         camera.reset();
+        //Gameboard rotation reset
+        xIncr = 0;
+        yIncr = 0;
+        zIncr = 0;
         break;
     case 't':
     case 'T':
@@ -121,9 +153,18 @@ void keyboard(unsigned char key, int x, int y)
     case 'G':
         gameBoard.rotate(Vec3D(-1,0,0));
         break;
-    case 'h':
-    case 'H':
+    case 'v':
+    case 'V':
         gameBoard.rotate(Vec3D(0,0,-1));
+        break;
+    case 'x': //<--- New code added: gameboard rotation
+        xIncr += 15;
+        break;
+    case 'y':
+        yIncr += 15;
+        break;
+    case 'z':
+        zIncr += 15;
         break;
     default:
         break;
