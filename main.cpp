@@ -29,6 +29,7 @@ Final Project:
 #include "camera.h"
 #include "board.h"
 #include "utils/objectLoader.h"
+#include "shapes/ball.h"
 using namespace std;
 
 // Define GLUT Constants
@@ -49,12 +50,13 @@ int windowHeight = 600;
 // float diff1[4] = {1, 1, 1, 1};
 // float spec1[4] = {1, 1, 1, 1};
 
-objl::Loader Ball;
+objl::Loader BallObject;
 bool fileLoaded = false;
+
+Ball football = Ball(Point3D(0, 1, 0), Vec3D(0, 0, 0), 0.5, 0);
 void loadBall()
 {
-    fileLoaded = Ball.LoadFile("shapes/ball.obj");
-    // Ball.LoadMaterials("shape/ball.mtl");
+    fileLoaded = BallObject.LoadFile("shapes/ball.obj");
 }
 
 void drawFromObj(objl::Loader Object)
@@ -100,8 +102,15 @@ void drawFromObj(objl::Loader Object)
 }
 
 CameraSystem camera = CameraSystem();
-Board gameBoard = Board(Vec3D(0, 0, 0), 5);
+Board gameBoard = Board(Vec3D(0, 0, 0), 15);
 
+void renderBall()
+{
+    glTranslatef(football.position.z, football.position.y, football.position.x);
+    glRotatef(football.rotationAngle, xIncr, yIncr, zIncr);
+    glScalef(football.size, football.size, football.size);
+    drawFromObj(BallObject);
+}
 // Draw axis on board (for debugging help)
 void drawAxis()
 {
@@ -138,7 +147,7 @@ void display()
     // glLightfv(GL_LIGHT0, GL_AMBIENT, amb1);
     // glLightfv(GL_LIGHT0, GL_DIFFUSE, diff1);
     // glLightfv(GL_LIGHT0, GL_SPECULAR, spec1);
-    
+
     //drawAxis(); <-- Helps to debug movement issues
 
     // Gameboard rotation code
@@ -147,12 +156,11 @@ void display()
     glRotatef(0 + yIncr, 0, 1, 0);
     glRotatef(0 + zIncr, 0, 0, 1);
     gameBoard.draw();
+    glPushMatrix();
+    renderBall();
+    glPopMatrix();
     glPopMatrix();
 
-    glPushMatrix();
-    glTranslatef(0, 1, 0);
-    drawFromObj(Ball);
-    glPopMatrix();
     // Swap Buffers
     glutSwapBuffers();
 };
@@ -161,6 +169,7 @@ void display()
 void animate(int v)
 {
     // Redraw
+    football.update(xIncr, yIncr, zIncr);
     glutPostRedisplay();
 
     // Call this function again in 20 milliseconds
@@ -184,21 +193,13 @@ void keyboard(unsigned char key, int x, int y)
     case 'Q':
         exit(0);
         break;
-    case 'w':
-    case 'W':
+    case 'u':
+    case 'U':
         camera.zoomIn();
         break;
-    case 's':
-    case 'S':
+    case 'j':
+    case 'J':
         camera.zoomOut();
-        break;
-    case 'a':
-    case 'A':
-        camera.moveLeft();
-        break;
-    case 'd':
-    case 'D':
-        camera.moveRight();
         break;
     case 'r':
     case 'R':
@@ -207,31 +208,26 @@ void keyboard(unsigned char key, int x, int y)
         xIncr = 0;
         yIncr = 0;
         zIncr = 0;
+        football.position.z = 0;
+        football.position.y = 1;
+        football.position.x = 0;
         break;
-    case 't':
-    case 'T':
-        gameBoard.rotate(Vec3D(1, 0, 0));
+    case 'w':
+    case 'W': //<--- New code added: gameboard rotation
+        xIncr -= 1;
         break;
-    case 'f':
-    case 'F':
-        gameBoard.rotate(Vec3D(0, 0, 1));
+    case 's':
+    case 'S':
+        xIncr += 1;
+        // yIncr += 1;
         break;
-    case 'g':
-    case 'G':
-        gameBoard.rotate(Vec3D(-1, 0, 0));
+    case 'a':
+    case 'A':
+        zIncr += 1;
         break;
-    case 'v':
-    case 'V':
-        gameBoard.rotate(Vec3D(0, 0, -1));
-        break;
-    case 'x': //<--- New code added: gameboard rotation
-        xIncr += 15;
-        break;
-    case 'y':
-        yIncr += 15;
-        break;
-    case 'z':
-        zIncr += 15;
+    case 'd':
+    case 'D':
+        zIncr -= 1;
         break;
     default:
         break;
@@ -251,10 +247,10 @@ void specialKeyboard(int key, int x, int y)
         camera.cameraDown();
         break;
     case GLUT_KEY_LEFT:
-        camera.tiltLeft();
+        camera.moveLeft();
         break;
     case GLUT_KEY_RIGHT:
-        camera.tiltRight();
+        camera.moveRight();
         break;
     default:
         break;
@@ -306,6 +302,7 @@ int main(int argc, char **argv)
     glEnable(GL_CULL_FACE);
 
     init();
+    animate(1);
 
     glutMainLoop(); //starts the event loop
 
