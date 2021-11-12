@@ -28,11 +28,13 @@ Final Project:
 #include <vector>
 #include "camera.h"
 #include "board.h"
+#include "utils/objectLoader.h"
+using namespace std;
 
 // Define GLUT Constants
 #define WINDOW_TITLE "3GC3 Final Project"
 
-// Global variables for gameboard rotation increments 
+// Global variables for gameboard rotation increments
 float xIncr = 0;
 float yIncr = 0;
 float zIncr = 0;
@@ -42,24 +44,74 @@ int timerFunc = 20;
 int windowWidth = 800;
 int windowHeight = 600;
 
+objl::Loader Ball;
+bool fileLoaded = false;
+void loadBall()
+{
+    fileLoaded = Ball.LoadFile("shapes/ball.obj");
+}
+
+void drawFromObj(objl::Loader Object)
+{
+    if (fileLoaded)
+    {
+        for (int i = 0; i < Object.LoadedMeshes.size(); i++)
+        {
+            objl::Mesh curMesh = Object.LoadedMeshes[i];
+            for (int j = 0; j < curMesh.Indices.size(); j += 3)
+            {
+                glBegin(GL_TRIANGLES);
+
+                glColor3f(1, 1, 1);
+                int indice1 = curMesh.Indices[j];
+                int indice2 = curMesh.Indices[j + 1];
+                int indice3 = curMesh.Indices[j + 2];
+
+                float ambient[4] = {curMesh.MeshMaterial.Ka.X, curMesh.MeshMaterial.Ka.Y, curMesh.MeshMaterial.Ka.Z, 1};
+                float diffuse[4] = {curMesh.MeshMaterial.Kd.X, curMesh.MeshMaterial.Kd.Y, curMesh.MeshMaterial.Kd.Z, 1};
+                float specular[4] = {curMesh.MeshMaterial.Ks.X, curMesh.MeshMaterial.Ks.Y, curMesh.MeshMaterial.Ks.Z, 1};
+                glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
+                glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
+                glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
+                
+                glNormal3f(curMesh.Vertices[indice1].Normal.X, curMesh.Vertices[indice1].Normal.Y, curMesh.Vertices[indice1].Normal.Z);
+                glTexCoord2f(curMesh.Vertices[indice1].TextureCoordinate.X,curMesh.Vertices[indice1].TextureCoordinate.Y);
+                glVertex3f(curMesh.Vertices[indice1].Position.X, curMesh.Vertices[indice1].Position.Y, curMesh.Vertices[indice1].Position.Z);
+
+                glNormal3f(curMesh.Vertices[indice2].Normal.X, curMesh.Vertices[indice2].Normal.Y, curMesh.Vertices[indice2].Normal.Z);
+                glTexCoord2f(curMesh.Vertices[indice2].TextureCoordinate.X,curMesh.Vertices[indice2].TextureCoordinate.Y);
+                glVertex3f(curMesh.Vertices[indice2].Position.X, curMesh.Vertices[indice2].Position.Y, curMesh.Vertices[indice2].Position.Z);
+                
+                glNormal3f(curMesh.Vertices[indice3].Normal.X, curMesh.Vertices[indice3].Normal.Y, curMesh.Vertices[indice3].Normal.Z);
+                glTexCoord2f(curMesh.Vertices[indice3].TextureCoordinate.X,curMesh.Vertices[indice3].TextureCoordinate.Y);
+                glVertex3f(curMesh.Vertices[indice3].Position.X, curMesh.Vertices[indice3].Position.Y, curMesh.Vertices[indice3].Position.Z);
+
+                glEnd();
+            }
+        }
+    }
+    return;
+}
+
 CameraSystem camera = CameraSystem();
-Board gameBoard = Board(Vec3D(0,0,0), 5);
+Board gameBoard = Board(Vec3D(0, 0, 0), 5);
 
 // Draw axis on board (for debugging help)
-void drawAxis(){
-    glPushMatrix(); 
+void drawAxis()
+{
+    glPushMatrix();
     glLineWidth(2);
     glBegin(GL_LINES);
 
-    glColor3f (1.0, 0.0, 0.0);
+    glColor3f(1.0, 0.0, 0.0);
     glVertex3f(0.0, 0.0, 0.0);
     glVertex3f(10.0, 0.0, 0.0);
 
-    glColor3f (1.0, 1.0, 0.0);
+    glColor3f(1.0, 1.0, 0.0);
     glVertex3f(0.0, 0.0, 0.0);
     glVertex3f(0.0, 10.0, 0.0);
 
-    glColor3f (0.0, 0.0, 1.0);
+    glColor3f(0.0, 0.0, 1.0);
     glVertex3f(0.0, 0.0, 0.0);
     glVertex3f(0.0, 0.0, 10.0);
     glEnd();
@@ -75,17 +127,21 @@ void display()
     glLoadIdentity();
     gluLookAt(camera.getX(), camera.getY(), camera.getZ(), 0, 0, 0, camera.rotX, camera.rotY, camera.rotZ);
     glColor3f(1, 1, 1);
-    
+
     //drawAxis(); <-- Helps to debug movement issues
 
     // Gameboard rotation code
     glPushMatrix();
-    glRotatef(0+xIncr, 1, 0, 0);
-    glRotatef(0+yIncr, 0, 1, 0);
-    glRotatef(0+zIncr, 0, 0, 1);
+    glRotatef(0 + xIncr, 1, 0, 0);
+    glRotatef(0 + yIncr, 0, 1, 0);
+    glRotatef(0 + zIncr, 0, 0, 1);
     gameBoard.draw();
     glPopMatrix();
 
+    glPushMatrix();
+    glTranslatef(0, 1, 0);
+    drawFromObj(Ball);
+    glPopMatrix();
     // Swap Buffers
     glutSwapBuffers();
 };
@@ -143,19 +199,19 @@ void keyboard(unsigned char key, int x, int y)
         break;
     case 't':
     case 'T':
-        gameBoard.rotate(Vec3D(1,0,0));
+        gameBoard.rotate(Vec3D(1, 0, 0));
         break;
     case 'f':
     case 'F':
-        gameBoard.rotate(Vec3D(0,0,1));
+        gameBoard.rotate(Vec3D(0, 0, 1));
         break;
     case 'g':
     case 'G':
-        gameBoard.rotate(Vec3D(-1,0,0));
+        gameBoard.rotate(Vec3D(-1, 0, 0));
         break;
     case 'v':
     case 'V':
-        gameBoard.rotate(Vec3D(0,0,-1));
+        gameBoard.rotate(Vec3D(0, 0, -1));
         break;
     case 'x': //<--- New code added: gameboard rotation
         xIncr += 15;
@@ -198,13 +254,13 @@ void specialKeyboard(int key, int x, int y)
 // Glut Initialization Function
 void init()
 {
+    loadBall();
     glClearColor(0.5, 0.5, 0.5, 0);
     glColor3f(1, 1, 1);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     //glOrtho(-2, 2, -2, 2, -2, 2);
     gluPerspective(45, 1, 1, 100);
-
 };
 
 // Print Program Instructions
@@ -224,11 +280,11 @@ int main(int argc, char **argv)
     glutInitWindowSize(800, 800);
     glutInitWindowPosition(100, 100);
 
-    glutCreateWindow("Labyrinth");  //creates the window
+    glutCreateWindow("Labyrinth"); //creates the window
 
-    glutDisplayFunc(display);           //registers "display" as the display callback function
-    glutKeyboardFunc(keyboard);         //registers "keyboard" as the keyboard callback function
-    glutSpecialFunc(specialKeyboard);   //registers "specialKeyboard" as the special callback function
+    glutDisplayFunc(display);         //registers "display" as the display callback function
+    glutKeyboardFunc(keyboard);       //registers "keyboard" as the keyboard callback function
+    glutSpecialFunc(specialKeyboard); //registers "specialKeyboard" as the special callback function
 
     //Set up efficient 3D
     glEnable(GL_DEPTH_TEST);
