@@ -44,7 +44,32 @@ float zIncr = 0;
 int timerFunc = 20;
 int windowWidth = 800;
 int windowHeight = 600;
+const int baseSize = 24;
 
+int Wall[baseSize][baseSize] = {{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+                                {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+                                {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1},
+                                {1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1},
+                                {1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1},
+                                {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1},
+                                {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1},
+                                {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1},
+                                {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1},
+                                {1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1},
+                                {1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+                                {1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+                                {1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1},
+                                {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+                                {1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+                                {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1},
+                                {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+                                {1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1},
+                                {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1},
+                                {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
+                                {1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1},
+                                {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
+                                {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
+                                {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
 // float light_pos1[4] = {5, 5, 5, 1};
 // float amb1[4] = {1, 1, 1, 1};
 // float diff1[4] = {1, 1, 1, 1};
@@ -102,7 +127,7 @@ void drawFromObj(objl::Loader Object)
 }
 
 CameraSystem camera = CameraSystem();
-Board gameBoard = Board(Vec3D(0, 0, 0), 15);
+Board gameBoard = Board(Vec3D(0, 0, 0), baseSize);
 
 void renderBall()
 {
@@ -112,6 +137,23 @@ void renderBall()
     drawFromObj(BallObject);
 }
 // Draw axis on board (for debugging help)
+void renderWalls()
+{
+    for (int i = 0; i < baseSize; i++)
+    {
+        for (int j = 0; j < baseSize; j++)
+        {
+            if (Wall[i][j] == 1)
+            {
+
+                glPushMatrix();
+                glTranslatef(i, 1, j);
+                glutSolidCube(1.0);
+                glPopMatrix();
+            }
+        }
+    }
+}
 void drawAxis()
 {
     glPushMatrix();
@@ -150,15 +192,29 @@ void display()
 
     //drawAxis(); <-- Helps to debug movement issues
 
-    // Gameboard rotation code
+    // Matrix so ball and walls move as board rotates
     glPushMatrix();
+
+    // Add Gameboard
     glRotatef(0 + xIncr, 1, 0, 0);
     glRotatef(0 + yIncr, 0, 1, 0);
     glRotatef(0 + zIncr, 0, 0, 1);
     gameBoard.draw();
+
+    //Adding Ball
     glPushMatrix();
     renderBall();
     glPopMatrix();
+
+    // Add Walls
+    glPushMatrix();
+    glColor3f(1, 0, 1);
+    glTranslatef(-1 * (baseSize / 2), 0, -1 * (baseSize / 2));
+    glPushMatrix();
+    renderWalls();
+    glPopMatrix();
+    glPopMatrix();
+
     glPopMatrix();
 
     // Swap Buffers
