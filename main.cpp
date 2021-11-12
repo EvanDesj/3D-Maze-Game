@@ -44,11 +44,17 @@ int timerFunc = 20;
 int windowWidth = 800;
 int windowHeight = 600;
 
+// float light_pos1[4] = {5, 5, 5, 1};
+// float amb1[4] = {1, 1, 1, 1};
+// float diff1[4] = {1, 1, 1, 1};
+// float spec1[4] = {1, 1, 1, 1};
+
 objl::Loader Ball;
 bool fileLoaded = false;
 void loadBall()
 {
     fileLoaded = Ball.LoadFile("shapes/ball.obj");
+    // Ball.LoadMaterials("shape/ball.mtl");
 }
 
 void drawFromObj(objl::Loader Object)
@@ -62,28 +68,28 @@ void drawFromObj(objl::Loader Object)
             {
                 glBegin(GL_TRIANGLES);
 
-                glColor3f(1, 1, 1);
+                glColor3f(curMesh.MeshMaterial.Ka.X, curMesh.MeshMaterial.Ka.Y, curMesh.MeshMaterial.Ka.Z);
                 int indice1 = curMesh.Indices[j];
                 int indice2 = curMesh.Indices[j + 1];
                 int indice3 = curMesh.Indices[j + 2];
 
-                float ambient[4] = {curMesh.MeshMaterial.Ka.X, curMesh.MeshMaterial.Ka.Y, curMesh.MeshMaterial.Ka.Z, 1};
-                float diffuse[4] = {curMesh.MeshMaterial.Kd.X, curMesh.MeshMaterial.Kd.Y, curMesh.MeshMaterial.Kd.Z, 1};
-                float specular[4] = {curMesh.MeshMaterial.Ks.X, curMesh.MeshMaterial.Ks.Y, curMesh.MeshMaterial.Ks.Z, 1};
-                glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
-                glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
-                glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
-                
+                // float ambient[4] = {curMesh.MeshMaterial.Ka.X, curMesh.MeshMaterial.Ka.Y, curMesh.MeshMaterial.Ka.Z, 1};
+                // float diffuse[4] = {curMesh.MeshMaterial.Kd.X, curMesh.MeshMaterial.Kd.Y, curMesh.MeshMaterial.Kd.Z, 1};
+                // float specular[4] = {curMesh.MeshMaterial.Ks.X, curMesh.MeshMaterial.Ks.Y, curMesh.MeshMaterial.Ks.Z, 1};
+                // glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
+                // glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
+                // glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
+
+                glTexCoord2f(curMesh.Vertices[indice1].TextureCoordinate.X, curMesh.Vertices[indice1].TextureCoordinate.Y);
                 glNormal3f(curMesh.Vertices[indice1].Normal.X, curMesh.Vertices[indice1].Normal.Y, curMesh.Vertices[indice1].Normal.Z);
-                glTexCoord2f(curMesh.Vertices[indice1].TextureCoordinate.X,curMesh.Vertices[indice1].TextureCoordinate.Y);
                 glVertex3f(curMesh.Vertices[indice1].Position.X, curMesh.Vertices[indice1].Position.Y, curMesh.Vertices[indice1].Position.Z);
 
+                glTexCoord2f(curMesh.Vertices[indice2].TextureCoordinate.X, curMesh.Vertices[indice2].TextureCoordinate.Y);
                 glNormal3f(curMesh.Vertices[indice2].Normal.X, curMesh.Vertices[indice2].Normal.Y, curMesh.Vertices[indice2].Normal.Z);
-                glTexCoord2f(curMesh.Vertices[indice2].TextureCoordinate.X,curMesh.Vertices[indice2].TextureCoordinate.Y);
                 glVertex3f(curMesh.Vertices[indice2].Position.X, curMesh.Vertices[indice2].Position.Y, curMesh.Vertices[indice2].Position.Z);
-                
+
+                glTexCoord2f(curMesh.Vertices[indice3].TextureCoordinate.X, curMesh.Vertices[indice3].TextureCoordinate.Y);
                 glNormal3f(curMesh.Vertices[indice3].Normal.X, curMesh.Vertices[indice3].Normal.Y, curMesh.Vertices[indice3].Normal.Z);
-                glTexCoord2f(curMesh.Vertices[indice3].TextureCoordinate.X,curMesh.Vertices[indice3].TextureCoordinate.Y);
                 glVertex3f(curMesh.Vertices[indice3].Position.X, curMesh.Vertices[indice3].Position.Y, curMesh.Vertices[indice3].Position.Z);
 
                 glEnd();
@@ -128,6 +134,11 @@ void display()
     gluLookAt(camera.getX(), camera.getY(), camera.getZ(), 0, 0, 0, camera.rotX, camera.rotY, camera.rotZ);
     glColor3f(1, 1, 1);
 
+    // glLightfv(GL_LIGHT0, GL_POSITION, light_pos1);
+    // glLightfv(GL_LIGHT0, GL_AMBIENT, amb1);
+    // glLightfv(GL_LIGHT0, GL_DIFFUSE, diff1);
+    // glLightfv(GL_LIGHT0, GL_SPECULAR, spec1);
+    
     //drawAxis(); <-- Helps to debug movement issues
 
     // Gameboard rotation code
@@ -254,6 +265,8 @@ void specialKeyboard(int key, int x, int y)
 // Glut Initialization Function
 void init()
 {
+    // glEnable(GL_LIGHTING);
+    // glEnable(GL_LIGHT0);
     loadBall();
     glClearColor(0.5, 0.5, 0.5, 0);
     glColor3f(1, 1, 1);
