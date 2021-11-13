@@ -221,11 +221,43 @@ void display()
     glutSwapBuffers();
 };
 
+bool collisionDetected(float x, float z)
+{
+    int posX, posZ = 0;
+    if (xIncr < 0)
+    {
+        posX = round(x - football.size + baseSize / 2);
+    }
+    else
+    {
+        posX = round(x + football.size + baseSize / 2);
+    }
+    if (zIncr < 0)
+    {
+        posZ = round(z + football.size + baseSize / 2);
+    }
+    else
+    {
+        posZ = round(z - football.size + baseSize / 2);
+    }
+    if (!Wall[posZ][posX])
+    {
+        return false;
+    }
+    return true;
+}
 // Animate Callback Function
 void animate(int v)
 {
     // Redraw
-    football.update(xIncr, yIncr, zIncr);
+    Point3D expectedPoint = football.nextPosition(xIncr, yIncr, zIncr);
+    if (!collisionDetected(expectedPoint.x, expectedPoint.z))
+    {
+        football.update(expectedPoint);
+    }
+    // else{
+
+    // }
     glutPostRedisplay();
 
     // Call this function again in 20 milliseconds
@@ -256,6 +288,10 @@ void keyboard(unsigned char key, int x, int y)
     case 'j':
     case 'J':
         camera.zoomOut();
+        break;
+    case 'c':
+    case 'C':
+        camera.reset();
         break;
     case 'r':
     case 'R':
