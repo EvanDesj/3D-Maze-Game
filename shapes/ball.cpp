@@ -15,20 +15,29 @@ Point3D Ball::nextPosition(float x, float y, float z)
 {
     Point3D newPoint;
     newPoint.x = position.x + (x * speed);
-    newPoint.y = position.y + (y * speed);
+    newPoint.y = position.y;
     newPoint.z = position.z + (-1 * z * speed);
     return newPoint;
 }
 
+bool positionsEqual(Point3D p1, Point3D p2)
+{
+    return (p1.x == p2.x && p1.y == p2.y && p1.z == p2.z);
+}
+
 void Ball::update(Point3D newPosition)
 {
-    this->position = newPosition;
-    if (rotationAngle <= 339)
+    if (!positionsEqual(position, newPosition))
     {
-        rotationAngle += 20;
-    }
-    else
-    {
-        rotationAngle = 0;
+        this->position = newPosition;
+        if (rotationAngle <= 339)
+        {
+            rotationAngle += 20;
+        }
+        else
+        {
+            rotationAngle = 0;
+        }
     }
 }
+

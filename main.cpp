@@ -41,7 +41,7 @@ float yIncr = 0;
 float zIncr = 0;
 // ------------------------//
 
-int timerFunc = 20;
+int timerFunc = 1;
 int windowWidth = 800;
 int windowHeight = 600;
 const int baseSize = 24;
@@ -247,20 +247,35 @@ bool collisionDetected(float x, float z)
     return true;
 }
 // Animate Callback Function
-void animate(int v)
+void updateBallPosition()
 {
-    // Redraw
     Point3D expectedPoint = football.nextPosition(xIncr, yIncr, zIncr);
     if (!collisionDetected(expectedPoint.x, expectedPoint.z))
     {
         football.update(expectedPoint);
+        return;
     }
-    // else{
+    expectedPoint = football.nextPosition(xIncr, 0, 0);
+    if (!collisionDetected(expectedPoint.x, expectedPoint.z))
+    {
+        football.update(expectedPoint);
+        return;
+    }
+    expectedPoint = football.nextPosition(0, 0, zIncr);
+    if (!collisionDetected(expectedPoint.x, expectedPoint.z))
+    {
+        football.update(expectedPoint);
+        return;
+    }
+}
 
-    // }
+void animate(int v)
+{
+    // Redraw
+    updateBallPosition();
     glutPostRedisplay();
 
-    // Call this function again in 20 milliseconds
+    // Call this function again at fixed intervals
     glutTimerFunc(timerFunc, animate, 0);
 };
 
