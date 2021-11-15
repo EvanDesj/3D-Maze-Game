@@ -136,7 +136,7 @@ void renderBall()
     glScalef(football.size, football.size, football.size);
     drawFromObj(BallObject);
 }
-// Draw axis on board (for debugging help)
+
 void renderWalls()
 {
     for (int i = 0; i < baseSize; i++)
@@ -154,6 +154,7 @@ void renderWalls()
         }
     }
 }
+
 void drawAxis()
 {
     glPushMatrix();
@@ -192,7 +193,7 @@ void display()
 
     //drawAxis(); <-- Helps to debug movement issues
 
-    // Matrix so ball and walls move as board rotates
+    // Matrix so ball and walls also move as board rotates
     glPushMatrix();
 
     // Add Gameboard
@@ -246,7 +247,7 @@ bool collisionDetected(float x, float z)
     }
     return true;
 }
-// Animate Callback Function
+
 void updateBallPosition()
 {
     Point3D expectedPoint = football.nextPosition(xIncr, yIncr, zIncr);
@@ -269,13 +270,11 @@ void updateBallPosition()
     }
 }
 
+// Animate Callback Function
 void animate(int v)
 {
-    // Redraw
     updateBallPosition();
     glutPostRedisplay();
-
-    // Call this function again at fixed intervals
     glutTimerFunc(timerFunc, animate, 0);
 };
 
