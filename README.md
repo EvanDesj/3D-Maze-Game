@@ -98,7 +98,7 @@ Movement :
 This is the ball that is placed on the board, and it moves and rotates as the board is tilted. This class contains information about the position, rotation and speed of the ball, while the material, color and other visual properties are loaded in via the .obj loader.
 
 ### Walls/Maze
-> Located in [main.cpp[(main.cpp)
+> Located in [main.cpp](main.cpp)
 
 - The walls are represented as a 2D Matrix. 
 - The size of the walls needs to be the same as the size of the base board (**baseSize**), otherwise it might exceed the boundaries of the board.
@@ -106,7 +106,7 @@ This is the ball that is placed on the board, and it moves and rotates as the bo
 - The wall/maze is rendered via the **renderWalls()** method. For each **1** present in the **Wall** matrix, a solid cube of size 1 is rendered at it's location.
 
 ### Collision Detection
-> Located in [main.cpp[(main.cpp)
+> Located in [main.cpp](main.cpp)
 
 A basic collision detection algorithm has been implemented. This algorithm is run on every animation cycle.
 The way this works is:
