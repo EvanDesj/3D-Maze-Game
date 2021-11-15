@@ -50,7 +50,7 @@ make clean && make
 
 The board is drawn in [main.cpp](main.cpp) based on **baseSize** defined at the beginning of the program.
 
-The board is redrawn on every animation cycle, with it's rotation/inline managed by **xIncr**, **yIncr** & **zIncr**.
+The board is redrawn on every animation cycle, with it's rotation/incline managed by **xIncr**, **yIncr** & **zIncr**.
 
 The board can be tilted by using the **W**, **A**, **S**, **D** keys.
 
