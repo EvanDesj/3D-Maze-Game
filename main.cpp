@@ -383,7 +383,14 @@ void printInstructions()
 {
     using namespace std;
     cout << "Program Instructions:" << endl;
-};
+    cout << "Use q to close the program at any time." << endl;
+    cout << "Use u and j to zoom in and out with the camera." << endl;
+    cout << "Use the left and right arrow keys to move the camera around the board." << endl;
+    cout << "Use the up and down arrow keys to move the camera above and below the board." << endl;
+    cout << "Use c to reset the camera to its initial view." << endl;
+    cout << "Use w,a,s,d to tilt the gameboard. This allows the ball to roll in the direction the board is tilted if there are no walls obstructing it." << endl;
+    cout << "Use r to reset the program." << endl;
+}
 
 // Main program
 int main(int argc, char **argv)
@@ -396,6 +403,8 @@ int main(int argc, char **argv)
     glutInitWindowPosition(100, 100);
 
     glutCreateWindow("Labyrinth"); //creates the window
+
+    printInstructions();
 
     glutDisplayFunc(display);         //registers "display" as the display callback function
     glutKeyboardFunc(keyboard);       //registers "keyboard" as the keyboard callback function
