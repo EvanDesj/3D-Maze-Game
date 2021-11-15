@@ -46,7 +46,7 @@ make clean && make
 
 ## What's Included
 ### Base Board with Tilt
-> Located in [Board Class](board.h)`
+> Located in [Board Class](board.h)
 
 The board is drawn in [main.cpp](main.cpp) based on **baseSize** defined at the beginning of the program.
 
