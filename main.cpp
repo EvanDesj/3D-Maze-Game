@@ -1,9 +1,7 @@
 /*
 Final Project:
-    - Name: Evan Desjardine
-    - Student ID: desjarde
-    - Email: [desjarde@mcmaster.ca](mailto:desjarde@mcmaster.ca)
-    - Operating System: Windows 10
+    - Name: Anant Jain, Evan Desjardine, Lin Rozenszajn, Rahil Shah
+    - Operating System: Windows 10, Ubuntu 21.04
 */
 
 // Include OpenGL/GLUT Libraries
@@ -33,19 +31,21 @@ Final Project:
 using namespace std;
 
 // Define GLUT Constants
-#define WINDOW_TITLE "3GC3 Final Project"
+#define WINDOW_TITLE "3GC3 Final Project - Labyrinth"
 
+// Configuration Variables (Modify before build)
 // Global variables for gameboard rotation increments
 float xIncr = 0;
 float yIncr = 0;
 float zIncr = 0;
 // ------------------------//
-
-int timerFunc = 1;
+int timerFunc = 1; // Duration between animation frames, lower is better
 int windowWidth = 800;
 int windowHeight = 600;
-const int baseSize = 24;
 
+// Size of base board
+const int baseSize = 24;
+// Wall/Maze, 1 represents wall while 0 is empty space
 int Wall[baseSize][baseSize] = {{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
                                 {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1},
                                 {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1},
@@ -70,42 +70,35 @@ int Wall[baseSize][baseSize] = {{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                                 {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
                                 {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
                                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
-// float light_pos1[4] = {5, 5, 5, 1};
-// float amb1[4] = {1, 1, 1, 1};
-// float diff1[4] = {1, 1, 1, 1};
-// float spec1[4] = {1, 1, 1, 1};
 
-objl::Loader BallObject;
-bool fileLoaded = false;
+objl::Loader BallObject;                           // Ball object where ball.obj will be loaded in
+bool fileLoaded = false;                           // Boolean to check if the ball object has been loaded or not
+Ball football = Ball(Point3D(0, 1, 0), 0.5, 0);    // Initialize ball with base position (origin)
+CameraSystem camera = CameraSystem();              // Initialize camera system
+Board gameBoard = Board(Vec3D(0, 0, 0), baseSize); // Initialize game board
 
-Ball football = Ball(Point3D(0, 1, 0), Vec3D(0, 0, 0), 0.5, 0);
+// Function to load ball
 void loadBall()
 {
     fileLoaded = BallObject.LoadFile("shapes/ball.obj");
 }
 
+// Function to render loaded object
 void drawFromObj(objl::Loader Object)
 {
-    if (fileLoaded)
+    if (fileLoaded) // Only render if the object has been loaded
     {
         for (int i = 0; i < Object.LoadedMeshes.size(); i++)
         {
             objl::Mesh curMesh = Object.LoadedMeshes[i];
             for (int j = 0; j < curMesh.Indices.size(); j += 3)
             {
-                glBegin(GL_TRIANGLES);
+                glBegin(GL_TRIANGLES); // Draw triangle for each mesh indice
 
                 glColor3f(curMesh.MeshMaterial.Ka.X, curMesh.MeshMaterial.Ka.Y, curMesh.MeshMaterial.Ka.Z);
                 int indice1 = curMesh.Indices[j];
                 int indice2 = curMesh.Indices[j + 1];
                 int indice3 = curMesh.Indices[j + 2];
-
-                // float ambient[4] = {curMesh.MeshMaterial.Ka.X, curMesh.MeshMaterial.Ka.Y, curMesh.MeshMaterial.Ka.Z, 1};
-                // float diffuse[4] = {curMesh.MeshMaterial.Kd.X, curMesh.MeshMaterial.Kd.Y, curMesh.MeshMaterial.Kd.Z, 1};
-                // float specular[4] = {curMesh.MeshMaterial.Ks.X, curMesh.MeshMaterial.Ks.Y, curMesh.MeshMaterial.Ks.Z, 1};
-                // glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
-                // glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
-                // glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
 
                 glTexCoord2f(curMesh.Vertices[indice1].TextureCoordinate.X, curMesh.Vertices[indice1].TextureCoordinate.Y);
                 glNormal3f(curMesh.Vertices[indice1].Normal.X, curMesh.Vertices[indice1].Normal.Y, curMesh.Vertices[indice1].Normal.Z);
@@ -126,9 +119,7 @@ void drawFromObj(objl::Loader Object)
     return;
 }
 
-CameraSystem camera = CameraSystem();
-Board gameBoard = Board(Vec3D(0, 0, 0), baseSize);
-
+// Function to render ball
 void renderBall()
 {
     glTranslatef(football.position.z, football.position.y, football.position.x);
@@ -137,6 +128,7 @@ void renderBall()
     drawFromObj(BallObject);
 }
 
+// Function to render walls/maze
 void renderWalls()
 {
     for (int i = 0; i < baseSize; i++)
@@ -147,34 +139,34 @@ void renderWalls()
             {
 
                 glPushMatrix();
-                glTranslatef(i, 1, j);
-                glutSolidCube(1.0);
+                glTranslatef(i, 1, j); // Draw wall at position (i,j) at fixed y position
+                glutSolidCube(1.0);    // Draw cube of size 1
                 glPopMatrix();
             }
         }
     }
 }
 
-void drawAxis()
-{
-    glPushMatrix();
-    glLineWidth(2);
-    glBegin(GL_LINES);
+// void drawAxis()
+// {
+//     glPushMatrix();
+//     glLineWidth(2);
+//     glBegin(GL_LINES);
 
-    glColor3f(1.0, 0.0, 0.0);
-    glVertex3f(0.0, 0.0, 0.0);
-    glVertex3f(10.0, 0.0, 0.0);
+//     glColor3f(1.0, 0.0, 0.0);
+//     glVertex3f(0.0, 0.0, 0.0);
+//     glVertex3f(10.0, 0.0, 0.0);
 
-    glColor3f(1.0, 1.0, 0.0);
-    glVertex3f(0.0, 0.0, 0.0);
-    glVertex3f(0.0, 10.0, 0.0);
+//     glColor3f(1.0, 1.0, 0.0);
+//     glVertex3f(0.0, 0.0, 0.0);
+//     glVertex3f(0.0, 10.0, 0.0);
 
-    glColor3f(0.0, 0.0, 1.0);
-    glVertex3f(0.0, 0.0, 0.0);
-    glVertex3f(0.0, 0.0, 10.0);
-    glEnd();
-    glPopMatrix();
-}
+//     glColor3f(0.0, 0.0, 1.0);
+//     glVertex3f(0.0, 0.0, 0.0);
+//     glVertex3f(0.0, 0.0, 10.0);
+//     glEnd();
+//     glPopMatrix();
+// }
 
 // Display Callback Function
 void display()
@@ -185,11 +177,6 @@ void display()
     glLoadIdentity();
     gluLookAt(camera.getX(), camera.getY(), camera.getZ(), 0, 0, 0, camera.rotX, camera.rotY, camera.rotZ);
     glColor3f(1, 1, 1);
-
-    // glLightfv(GL_LIGHT0, GL_POSITION, light_pos1);
-    // glLightfv(GL_LIGHT0, GL_AMBIENT, amb1);
-    // glLightfv(GL_LIGHT0, GL_DIFFUSE, diff1);
-    // glLightfv(GL_LIGHT0, GL_SPECULAR, spec1);
 
     //drawAxis(); <-- Helps to debug movement issues
 
@@ -210,7 +197,7 @@ void display()
     // Add Walls
     glPushMatrix();
     glColor3f(1, 0, 1);
-    glTranslatef(-1 * (baseSize / 2), 0, -1 * (baseSize / 2));
+    glTranslatef(-1 * (baseSize / 2), 0, -1 * (baseSize / 2)); // To offset maze to correct position to overlay maze over base board and fix alignment
     glPushMatrix();
     renderWalls();
     glPopMatrix();
@@ -222,6 +209,7 @@ void display()
     glutSwapBuffers();
 };
 
+// Function to detect collision
 bool collisionDetected(float x, float z)
 {
     int posX, posZ = 0;
@@ -241,21 +229,23 @@ bool collisionDetected(float x, float z)
     {
         posZ = round(z - football.size + baseSize / 2);
     }
-    if (!Wall[posZ][posX])
+    if (Wall[posZ][posX]) // Check if a maze exists at ball's location
     {
-        return false;
+        return true;
     }
-    return true;
+    return false;
 }
 
+// Function to update ball's position
 void updateBallPosition()
 {
-    Point3D expectedPoint = football.nextPosition(xIncr, yIncr, zIncr);
+    Point3D expectedPoint = football.nextPosition(xIncr, yIncr, zIncr); // Check where ball will be next due to current board's tilt
     if (!collisionDetected(expectedPoint.x, expectedPoint.z))
     {
-        football.update(expectedPoint);
+        football.update(expectedPoint); // If no collision is detected, move ball to expected position
         return;
     }
+    // If collision is only detected on one axis, move ball along other axis if tilt is present.
     expectedPoint = football.nextPosition(xIncr, 0, 0);
     if (!collisionDetected(expectedPoint.x, expectedPoint.z))
     {
@@ -310,7 +300,6 @@ void keyboard(unsigned char key, int x, int y)
     case 'r':
     case 'R':
         camera.reset();
-        //Gameboard rotation reset
         xIncr = 0;
         yIncr = 0;
         zIncr = 0;
@@ -318,14 +307,14 @@ void keyboard(unsigned char key, int x, int y)
         football.position.y = 1;
         football.position.x = 0;
         break;
+    // Update gameboard rotation
     case 'w':
-    case 'W': //<--- New code added: gameboard rotation
+    case 'W':
         xIncr -= 1;
         break;
     case 's':
     case 'S':
         xIncr += 1;
-        // yIncr += 1;
         break;
     case 'a':
     case 'A':
@@ -367,14 +356,11 @@ void specialKeyboard(int key, int x, int y)
 // Glut Initialization Function
 void init()
 {
-    // glEnable(GL_LIGHTING);
-    // glEnable(GL_LIGHT0);
-    loadBall();
+    loadBall(); // Load ball only once
     glClearColor(0.5, 0.5, 0.5, 0);
     glColor3f(1, 1, 1);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    //glOrtho(-2, 2, -2, 2, -2, 2);
     gluPerspective(45, 1, 1, 100);
 };
 
@@ -395,31 +381,21 @@ void printInstructions()
 // Main program
 int main(int argc, char **argv)
 {
-    glutInit(&argc, argv); //starts up GLUT
-
+    glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-
     glutInitWindowSize(800, 800);
     glutInitWindowPosition(100, 100);
-
-    glutCreateWindow("Labyrinth"); //creates the window
-
+    glutCreateWindow(WINDOW_TITLE); //creates the window
     printInstructions();
-
     glutDisplayFunc(display);         //registers "display" as the display callback function
     glutKeyboardFunc(keyboard);       //registers "keyboard" as the keyboard callback function
     glutSpecialFunc(specialKeyboard); //registers "specialKeyboard" as the special callback function
-
-    //Set up efficient 3D
     glEnable(GL_DEPTH_TEST);
     glFrontFace(GL_CW);
     glCullFace(GL_FRONT);
     glEnable(GL_CULL_FACE);
-
     init();
     animate(1);
-
-    glutMainLoop(); //starts the event loop
-
+    glutMainLoop();
     return (0);
 };

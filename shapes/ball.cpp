@@ -2,10 +2,9 @@
 #include <iostream>
 using namespace std;
 
-Ball::Ball(Point3D position, Vec3D direction, float size, int rotationAngle)
+Ball::Ball(Point3D position, float size, int rotationAngle)
 {
     this->position = position;
-    this->direction = direction;
     this->size = size;
     this->rotationAngle = rotationAngle;
     this->speed = 0.1;
@@ -40,4 +39,3 @@ void Ball::update(Point3D newPosition)
         }
     }
 }
-
