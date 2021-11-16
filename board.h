@@ -8,7 +8,6 @@
 class Board
 {
 public:
-
     Vec3D center;
     int size;
     std::vector<std::vector<Cube>> board;

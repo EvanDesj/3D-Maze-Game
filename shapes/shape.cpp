@@ -11,8 +11,3 @@ Shape::Shape(Vec3D center, Vec3D size, Vec3D rotationAngle, Colour colour, Mater
     this->colour = colour;
     this->material = material;
 };
-
-void Shape::draw()
-{
-    //do nothing
-};

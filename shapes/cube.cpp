@@ -21,7 +21,7 @@
 #endif
 
 Cube::Cube(Vec3D center, Vec3D size, Vec3D rotationAngle, Colour colour, Material material)
-            : Shape(center, size, rotationAngle, colour, material)
+    : Shape(center, size, rotationAngle, colour, material)
 {
     this->center = center;
     this->size = size;
@@ -30,7 +30,8 @@ Cube::Cube(Vec3D center, Vec3D size, Vec3D rotationAngle, Colour colour, Materia
     this->material = material;
 };
 
-void Cube::draw() {
+void Cube::draw()
+{
     glPushMatrix();
 
     // Apply transformations

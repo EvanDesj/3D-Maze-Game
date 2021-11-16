@@ -16,7 +16,6 @@ public:
     Material material;
 
     Shape(Vec3D center, Vec3D size, Vec3D rotationAngle, Colour colour, Material material);
-    void draw();
 };
 
 #endif

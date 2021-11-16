@@ -1,7 +1,8 @@
 #ifndef MATHLIB_3D_H
 #define MATHLIB_3D_H
 
-class Point3D {
+class Point3D
+{
 public:
     Point3D();
     Point3D(float inX, float inY, float inZ);
@@ -12,7 +13,8 @@ public:
     float fastDistanceTo(Point3D other);
 };
 
-class Vec3D {
+class Vec3D
+{
 public:
     Vec3D();
     Vec3D(float inX, float inY, float inZ);

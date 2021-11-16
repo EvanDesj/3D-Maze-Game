@@ -1,9 +1,9 @@
 #ifndef COLOUR_H
 #define COLOUR_H
 
-class Colour {
+class Colour
+{
 public:
-
     float r;
     float g;
     float b;
@@ -12,7 +12,7 @@ public:
     Colour();
     Colour(float r, float g, float b, float a);
     void setColour(float r, float g, float b, float a);
-    float* getColour();
+    float *getColour();
     bool isColour(Colour other);
 };
 
