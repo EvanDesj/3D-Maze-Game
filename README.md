@@ -125,9 +125,11 @@ Since we are only computing the expected position of the ball and then checking 
 ## What's Next
 - Lighting 
 - Winning Conditions
+- New Levels
 - Advanced Ball Physics (Inertia and Momentum)
 - Code cleanup and restructure
-
+- Other features
+  
 ## Citations
  - **.OBJ Loader** : https://github.com/Bly7/OBJ-Loader 
 	- Used as is without modifications
