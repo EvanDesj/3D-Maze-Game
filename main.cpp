@@ -275,6 +275,15 @@ void reshape(int width, int height)
     windowHeight = height;
 };
 
+Vec3D computeTiltDirection()
+{
+    Point3D cameraPos = Point3D(camera.getX(), camera.getY(), camera.getZ());
+    Point3D center = Point3D(0, 0, 0);
+    Vec3D ray = Vec3D::createVector(cameraPos, center);
+    ray = ray.normalize();
+    return ray;
+}
+
 // Keyboard Callback Function
 void keyboard(unsigned char key, int x, int y)
 {
@@ -310,19 +319,23 @@ void keyboard(unsigned char key, int x, int y)
     // Update gameboard rotation
     case 'w':
     case 'W':
-        xIncr -= 1;
+        zIncr -= computeTiltDirection().x;
+        xIncr += computeTiltDirection().z;
         break;
     case 's':
     case 'S':
-        xIncr += 1;
+        zIncr += computeTiltDirection().x;
+        xIncr -= computeTiltDirection().z;
         break;
     case 'a':
     case 'A':
-        zIncr += 1;
+        zIncr -= computeTiltDirection().z;
+        xIncr -= computeTiltDirection().x;
         break;
     case 'd':
     case 'D':
-        zIncr -= 1;
+        zIncr += computeTiltDirection().z;
+        xIncr += computeTiltDirection().x;
         break;
     default:
         break;
