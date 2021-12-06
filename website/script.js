@@ -73,6 +73,29 @@ function exportBoard() {
   URL.revokeObjectURL(url);
 }
 
+function importBoard() {
+  const file = document.getElementById('file').files[0];
+  const reader = new FileReader();
+  reader.readAsText(file);
+  let uploadedBoard = '';
+  reader.onload = (event) => {
+    const text = event.target.result;
+    Object.values(text).forEach((char) => {
+      if (char === '{') {
+        uploadedBoard += '[';
+      } else if (char === '}') {
+        uploadedBoard += ']';
+      } else {
+        uploadedBoard += char;
+      }
+    });
+    playBoard = JSON.parse(uploadedBoard);
+    globalSize = playBoard.length;
+    // console.log(playBoard);
+    renderBoard();
+  };
+}
+
 const resetBoard = () => {
   generateBoard();
   renderBoard();
