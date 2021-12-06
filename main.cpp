@@ -177,7 +177,6 @@ void display()
     glLoadIdentity();
     gluLookAt(camera.getX(), camera.getY(), camera.getZ(), 0, 0, 0, camera.rotX, camera.rotY, camera.rotZ);
     glColor3f(1, 1, 1);
-
     //drawAxis(); <-- Helps to debug movement issues
 
     // Matrix so ball and walls also move as board rotates
@@ -321,26 +320,89 @@ void keyboard(unsigned char key, int x, int y)
     case 'W':
         zIncr -= computeTiltDirection().x;
         xIncr += computeTiltDirection().z;
+        if (zIncr < -10)
+        {
+            zIncr = -10;
+        }
+        if (zIncr > 10)
+        {
+            zIncr = 10;
+        }
+        if (xIncr < -10)
+        {
+            xIncr = -10;
+        }
+        if (xIncr > 10)
+        {
+            xIncr = 10;
+        }
         break;
     case 's':
     case 'S':
         zIncr += computeTiltDirection().x;
         xIncr -= computeTiltDirection().z;
+        if (zIncr < -10)
+        {
+            zIncr = -10;
+        }
+        if (zIncr > 10)
+        {
+            zIncr = 10;
+        }
+        if (xIncr < -10)
+        {
+            xIncr = -10;
+        }
+        if (xIncr > 10)
+        {
+            xIncr = 10;
+        }
         break;
     case 'a':
     case 'A':
         zIncr -= computeTiltDirection().z;
         xIncr -= computeTiltDirection().x;
+        if (zIncr < -10)
+        {
+            zIncr = -10;
+        }
+        if (zIncr > 10)
+        {
+            zIncr = 10;
+        }
+        if (xIncr < -10)
+        {
+            xIncr = -10;
+        }
+        if (xIncr > 10)
+        {
+            xIncr = 10;
+        }
         break;
     case 'd':
     case 'D':
         zIncr += computeTiltDirection().z;
         xIncr += computeTiltDirection().x;
+        if (zIncr < -10)
+        {
+            zIncr = -10;
+        }
+        if (zIncr > 10)
+        {
+            zIncr = 10;
+        }
+        if (xIncr < -10)
+        {
+            xIncr = -10;
+        }
+        if (xIncr > 10)
+        {
+            xIncr = 10;
+        }
         break;
     default:
         break;
     }
-    glutPostRedisplay();
 };
 
 // Special Keyboard Callback Function
@@ -363,7 +425,6 @@ void specialKeyboard(int key, int x, int y)
     default:
         break;
     }
-    glutPostRedisplay();
 };
 
 // Glut Initialization Function
