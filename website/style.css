@@ -5,15 +5,48 @@
   font-family: Arial, Helvetica, sans-serif;
 }
 
-.container {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: #eee;
+.background {
+  background: linear-gradient(226deg, #00ffbd, #c500ff, #00dbff, #00ffdf);
+  background-size: 800% 800%;
+
+  -webkit-animation: AnimationName 60s ease infinite;
+  -moz-animation: AnimationName 60s ease infinite;
+  animation: AnimationName 60s ease infinite;
 }
 
+@-webkit-keyframes AnimationName {
+  0% {
+    background-position: 0% 94%;
+  }
+  50% {
+    background-position: 100% 7%;
+  }
+  100% {
+    background-position: 0% 94%;
+  }
+}
+@-moz-keyframes AnimationName {
+  0% {
+    background-position: 0% 94%;
+  }
+  50% {
+    background-position: 100% 7%;
+  }
+  100% {
+    background-position: 0% 94%;
+  }
+}
+@keyframes AnimationName {
+  0% {
+    background-position: 0% 94%;
+  }
+  50% {
+    background-position: 100% 7%;
+  }
+  100% {
+    background-position: 0% 94%;
+  }
+}
 h1 {
   font-size: 2rem;
   margin-bottom: 0.5em;
@@ -27,28 +60,29 @@ h2 {
 
 .block {
   display: flex;
-  width: 50px;
-  height: 50px;
+  width: 25px;
+  height: 25px;
   align-items: center;
   justify-content: center;
-  font-size: 3rem;
+  font-size: 1.5rem;
   font-weight: bold;
-  /* border: 3px solid black; */
+  margin: 0 !important;
   transition: background 0.5s ease-in-out;
 }
 
 table {
-    border-spacing:0; /* Removes the cell spacing via CSS */
-    border-collapse: collapse;
+  border-spacing: 0; /* Removes the cell spacing via CSS */
+  border-collapse: collapse;
 }
 
-table{
-    border: 2px solid black;
-  }
-  table td {
-    border: 2px solid black; /* Style just to show the table cell boundaries */
-  }
-  
+table {
+  border: 2px solid black;
+  margin: auto;
+}
+
+table td {
+  border: 2px solid black; /* Style just to show the table cell boundaries */
+}
 
 .block:hover {
   cursor: pointer;
@@ -61,32 +95,6 @@ table{
 
 .occupied:hover {
   background: #ff3a3a;
-}
-
-button {
-  outline: none;
-  border: 4px solid green;
-  padding: 10px 20px;
-  font-size: 1rem;
-  font-weight: bold;
-  background: none;
-  transition: all 0.2s ease-in-out;
-}
-
-#file{
-  outline: none;
-  border: 4px solid green;
-  padding: 10px 20px;
-  font-size: 1rem;
-  font-weight: bold;
-  background: none;
-  transition: all 0.2s ease-in-out;
-}
-
-button:hover {
-  cursor: pointer;
-  background: green;
-  color: white;
 }
 
 @media only screen and (max-width: 600px) {

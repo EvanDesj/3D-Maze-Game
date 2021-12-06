@@ -1,6 +1,30 @@
 /* eslint-disable no-unused-vars */
-let globalSize = 12;
-let playBoard = [];
+let globalSize = 24;
+const defaultBoard = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1],
+  [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1],
+  [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1],
+  [1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1],
+  [1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1],
+  [1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1],
+  [1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1],
+  [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1],
+  [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1],
+  [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1],
+  [1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1],
+  [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]];
+let playBoard = defaultBoard.slice();
 
 const table = document.getElementById('myTable');
 
@@ -22,19 +46,23 @@ const renderBoard = () => {
 function generateBoard() {
   playBoard = [];
   let i = 0;
-  while (i <= globalSize) {
+  while (i < globalSize) {
     playBoard[i] = [];
     for (let index = 0; index < globalSize; index += 1) {
       playBoard[i].push(0);
     }
     i += 1;
   }
+  document.getElementById('edges').innerHTML = 'Fill Edges';
 }
 
 function updateNumbers() {
   let max = document.getElementById('number').value;
   if (!max || max < 3) {
     max = 3;
+  }
+  if (max > 50) {
+    max = 50;
   }
   globalSize = max;
   document.getElementById('number').value = max;
@@ -75,6 +103,9 @@ function exportBoard() {
 
 function importBoard() {
   const file = document.getElementById('file').files[0];
+  if (!file) {
+    return;
+  }
   const reader = new FileReader();
   reader.readAsText(file);
   let uploadedBoard = '';
@@ -91,9 +122,43 @@ function importBoard() {
     });
     playBoard = JSON.parse(uploadedBoard);
     globalSize = playBoard.length;
-    // console.log(playBoard);
+    document.getElementById('number').value = globalSize;
     renderBoard();
   };
+}
+
+function selectEdges() {
+  const checked = document.getElementById('edges').innerHTML === 'Fill Edges';
+  const first = 0;
+  const last = playBoard.length - 1;
+  let current = first;
+  while (current <= last) {
+    for (let index = 0; index < playBoard[current].length; index += 1) {
+      if (
+        checked
+        && (current === 0
+          || current === last
+          || index === 0
+          || index === playBoard[current].length - 1)
+      ) {
+        playBoard[current][index] = 1;
+      } else if (
+        current === 0
+        || current === last
+        || index === 0
+        || index === playBoard[current].length - 1
+      ) {
+        playBoard[current][index] = 0;
+      }
+    }
+    current += 1;
+  }
+  if (checked) {
+    document.getElementById('edges').innerHTML = 'Clear Edges';
+  } else {
+    document.getElementById('edges').innerHTML = 'Fill Edges';
+  }
+  renderBoard();
 }
 
 const resetBoard = () => {
@@ -101,4 +166,12 @@ const resetBoard = () => {
   renderBoard();
 };
 
-resetBoard();
+const loadDefaultBoard = () => {
+  playBoard = defaultBoard.slice();
+  globalSize = playBoard.length;
+  document.getElementById('number').value = globalSize;
+  renderBoard();
+};
+
+renderBoard();
+// resetBoard();
