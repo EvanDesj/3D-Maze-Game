@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>3GC3 Board Generator</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div class="container">
+        <h1>3GC3 Board Generator</h1>
+        Rows x Colums<input type="number" min="3" max="40" required value="12" id="number" onchange="updateNumbers()"></input>
+        <br>
+        <table id="myTable">
+        </table>
+        <button onclick="resetBoard()">RESET</button>
+        <button onclick="exportBoard()">DOWNLOAD</button>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
