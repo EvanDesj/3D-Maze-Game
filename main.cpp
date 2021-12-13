@@ -52,10 +52,16 @@ bool winStatus = false;
 std::chrono::steady_clock::time_point beginTime = std::chrono::steady_clock::now();
 bool timerStarted = false;
 float timeElapsed = 0;
-Ball football = Ball(Point3D(0, 1, 0), 0.5, 0);    // Initialize ball with base position (origin)
-CameraSystem camera = CameraSystem();              // Initialize camera system
-Board gameBoard = Board(Vec3D(0, 0, 0), baseSize); // Initialize game board
+Ball football = Ball(Point3D(0, 1, 0), 0.5, 0); // Initialize ball with base position (origin)
+CameraSystem camera = CameraSystem();           // Initialize camera system
+
 vector<vector<int>> Wall = level1;
+int baseSize()
+{
+    return Wall.size();
+}
+
+Board gameBoard = Board(Vec3D(0, 0, 0), baseSize()); // Initialize game board
 
 // Function to load ball
 void loadBall()
@@ -111,9 +117,9 @@ void renderBall()
 // Function to render walls/maze
 void renderWalls()
 {
-    for (int i = 0; i < baseSize; i++)
+    for (int i = 0; i < baseSize(); i++)
     {
-        for (int j = 0; j < baseSize; j++)
+        for (int j = 0; j < baseSize(); j++)
         {
             if (Wall[i][j] == 1)
             {
@@ -218,7 +224,7 @@ void display()
     // Add Walls
     glPushMatrix();
     glColor3f(1, 0, 1);
-    glTranslatef(-1 * (baseSize / 2), 0, -1 * (baseSize / 2)); // To offset maze to correct position to overlay maze over base board and fix alignment
+    glTranslatef(-1 * (baseSize() / 2), 0, -1 * (baseSize() / 2)); // To offset maze to correct position to overlay maze over base board and fix alignment
     glPushMatrix();
     renderWalls();
     glPopMatrix();
@@ -236,21 +242,21 @@ bool collisionDetected(float x, float z)
     int posX, posZ = 0;
     if (xIncr < 0)
     {
-        posX = round(x - football.size + baseSize / 2);
+        posX = round(x - football.size + baseSize() / 2);
     }
     else
     {
-        posX = round(x + football.size + baseSize / 2);
+        posX = round(x + football.size + baseSize() / 2);
     }
     if (zIncr < 0)
     {
-        posZ = round(z + football.size + baseSize / 2);
+        posZ = round(z + football.size + baseSize() / 2);
     }
     else
     {
-        posZ = round(z - football.size + baseSize / 2);
+        posZ = round(z - football.size + baseSize() / 2);
     }
-    if (posX < baseSize && posZ < baseSize && Wall[posZ][posX]) // Check if a maze exists at ball's location
+    if (posX < baseSize() && posZ < baseSize() && Wall[posZ][posX]) // Check if a maze exists at ball's location
     {
         return true;
     }
@@ -284,9 +290,9 @@ void updateBallPosition()
 bool outOfBounds()
 {
     Point3D expectedPoint = football.nextPosition(xIncr, yIncr, zIncr); // Check where ball will be next due to current board's tilt
-    float posX = expectedPoint.x + baseSize / 2;
-    float posZ = expectedPoint.z + baseSize / 2;
-    if ((posX > baseSize || posX < 0) || (posZ > baseSize || posZ < 0))
+    float posX = expectedPoint.x + baseSize() / 2;
+    float posZ = expectedPoint.z + baseSize() / 2;
+    if ((posX > baseSize() || posX < 0) || (posZ > baseSize() || posZ < 0))
     {
         return true;
     }
@@ -336,6 +342,7 @@ void boardReset()
     beginTime = std::chrono::steady_clock::now();
     timerStarted = false;
     timeElapsed = 0;
+    gameBoard = Board(Vec3D(0, 0, 0), baseSize()); // Reinitialize game board
 }
 
 // Keyboard Callback Function
@@ -344,12 +351,16 @@ void keyboard(unsigned char key, int x, int y)
     switch (key)
     {
     case '1':
-        boardReset();
         Wall = level1;
+        boardReset();
         break;
     case '2':
-        boardReset();
         Wall = level2;
+        boardReset();
+        break;
+    case '3':
+        Wall = level3;
+        boardReset();
         break;
     case 27:
     case 'q':
