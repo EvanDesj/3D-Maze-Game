@@ -209,9 +209,9 @@ void display()
     gluLookAt(camera.getX(), camera.getY(), camera.getZ(), 0, 0, 0, camera.rotX, camera.rotY, camera.rotZ);
 
     glPushMatrix();
-    renderText(-1, 12, 1, 0, 0, "Welcome");
-    renderText(-4, 11, 1, 1, 0, "Use W,A,S,D to control board");
-    renderText(-5, 10, 0, 1, 1, "Use arrow keys to control camera");
+    renderText(-1, 12, 1, 0, 0, (char *)"Welcome");
+    renderText(-4, 11, 1, 1, 0, (char *)"Use W,A,S,D to control board");
+    renderText(-5, 10, 0, 1, 1, (char *)"Use arrow keys to control camera");
     if (timeElapsed > 0)
     {
         char timeElapsedArray[10];
@@ -220,7 +220,7 @@ void display()
     }
     if (winStatus)
     {
-        renderText(-2, 8, 0, 0, 0, "You Won");
+        renderText(-2, 8, 0, 0, 0, (char *)"You Won");
     }
     glPopMatrix();
 
@@ -350,6 +350,20 @@ Vec3D computeTiltDirection()
     return ray;
 }
 
+void boardReset()
+{
+    xIncr = 0;
+    yIncr = 0;
+    zIncr = 0;
+    football.position.z = 0;
+    football.position.y = 1;
+    football.position.x = 0;
+    winStatus = false;
+    beginTime = std::chrono::steady_clock::now();
+    timerStarted = false;
+    timeElapsed = 0;
+}
+
 // Keyboard Callback Function
 void keyboard(unsigned char key, int x, int y)
 {
@@ -375,12 +389,7 @@ void keyboard(unsigned char key, int x, int y)
     case 'r':
     case 'R':
         camera.reset();
-        xIncr = 0;
-        yIncr = 0;
-        zIncr = 0;
-        football.position.z = 0;
-        football.position.y = 1;
-        football.position.x = 0;
+        boardReset();
         break;
     // Update gameboard rotation
     case 'w':
