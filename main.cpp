@@ -74,7 +74,7 @@ int Wall[baseSize][baseSize] = {{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
 
 objl::Loader BallObject; // Ball object where ball.obj will be loaded in
-bool fileLoaded = false; // Boolean to check if the ball object has been loaded or not
+bool ballTextureLoaded = false; // Boolean to check if the ball object has been loaded or not
 bool winStatus = false;
 std::chrono::steady_clock::time_point beginTime = std::chrono::steady_clock::now();
 bool timerStarted = false;
@@ -86,13 +86,13 @@ Board gameBoard = Board(Vec3D(0, 0, 0), baseSize); // Initialize game board
 // Function to load ball
 void loadBall()
 {
-    fileLoaded = BallObject.LoadFile("shapes/ball.obj");
+    ballTextureLoaded = BallObject.LoadFile("shapes/ball.obj");
 }
 
 // Function to render loaded object
 void drawFromObj(objl::Loader Object)
 {
-    if (fileLoaded) // Only render if the object has been loaded
+    if (ballTextureLoaded) // Only render if the object has been loaded
     {
         for (int i = 0; i < Object.LoadedMeshes.size(); i++)
         {
