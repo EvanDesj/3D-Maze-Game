@@ -29,6 +29,7 @@ Final Project:
 #include "utils/objectLoader.h"
 #include "shapes/ball.h"
 #include <string.h>
+#include <chrono>
 using namespace std;
 
 // Define GLUT Constants
@@ -75,6 +76,9 @@ int Wall[baseSize][baseSize] = {{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 objl::Loader BallObject; // Ball object where ball.obj will be loaded in
 bool fileLoaded = false; // Boolean to check if the ball object has been loaded or not
 bool winStatus = false;
+std::chrono::steady_clock::time_point beginTime = std::chrono::steady_clock::now();
+bool timerStarted = false;
+float timeElapsed = 0;
 Ball football = Ball(Point3D(0, 1, 0), 0.5, 0);    // Initialize ball with base position (origin)
 CameraSystem camera = CameraSystem();              // Initialize camera system
 Board gameBoard = Board(Vec3D(0, 0, 0), baseSize); // Initialize game board
@@ -149,6 +153,14 @@ void renderWalls()
     }
 }
 
+void startTimer()
+{
+    if (timerStarted == false)
+    {
+        beginTime = std::chrono::steady_clock::now();
+        timerStarted = true;
+    }
+}
 // void drawAxis()
 // {
 //     glPushMatrix();
@@ -186,6 +198,11 @@ void renderText(int x, int y, float r, float g, float b, char *string)
 void display()
 {
     // Clear and prepare
+    if (timerStarted && !winStatus)
+    {
+        std::chrono::steady_clock::time_point endTime = std::chrono::steady_clock::now();
+        timeElapsed = (std::chrono::duration_cast<std::chrono::microseconds>(endTime - beginTime).count()) / 1000000.0;
+    }
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -195,9 +212,15 @@ void display()
     renderText(-1, 12, 1, 0, 0, "Welcome");
     renderText(-4, 11, 1, 1, 0, "Use W,A,S,D to control board");
     renderText(-5, 10, 0, 1, 1, "Use arrow keys to control camera");
+    if (timeElapsed > 0)
+    {
+        char timeElapsedArray[10];
+        sprintf(timeElapsedArray, "%f", timeElapsed);
+        renderText(-2, 9, 1, 1, 1, timeElapsedArray);
+    }
     if (winStatus)
     {
-        renderText(-2, 9, 1, 1, 1, "You Won");
+        renderText(-2, 8, 0, 0, 0, "You Won");
     }
     glPopMatrix();
 
@@ -380,6 +403,7 @@ void keyboard(unsigned char key, int x, int y)
         {
             xIncr = 10;
         }
+        startTimer();
         break;
     case 's':
     case 'S':
@@ -401,6 +425,7 @@ void keyboard(unsigned char key, int x, int y)
         {
             xIncr = 10;
         }
+        startTimer();
         break;
     case 'a':
     case 'A':
@@ -422,6 +447,7 @@ void keyboard(unsigned char key, int x, int y)
         {
             xIncr = 10;
         }
+        startTimer();
         break;
     case 'd':
     case 'D':
@@ -443,6 +469,7 @@ void keyboard(unsigned char key, int x, int y)
         {
             xIncr = 10;
         }
+        startTimer();
         break;
     default:
         break;
