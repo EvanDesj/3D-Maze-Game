@@ -28,6 +28,7 @@ Final Project:
 #include "board.h"
 #include "utils/objectLoader.h"
 #include "shapes/ball.h"
+#include <string.h>
 using namespace std;
 
 // Define GLUT Constants
@@ -62,8 +63,8 @@ int Wall[baseSize][baseSize] = {{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                                 {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
                                 {1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
                                 {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1},
-                                {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
-                                {1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1},
+                                {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0},
+                                {1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
                                 {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1},
                                 {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
                                 {1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1},
@@ -71,8 +72,9 @@ int Wall[baseSize][baseSize] = {{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                                 {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
                                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
 
-objl::Loader BallObject;                           // Ball object where ball.obj will be loaded in
-bool fileLoaded = false;                           // Boolean to check if the ball object has been loaded or not
+objl::Loader BallObject; // Ball object where ball.obj will be loaded in
+bool fileLoaded = false; // Boolean to check if the ball object has been loaded or not
+bool winStatus = false;
 Ball football = Ball(Point3D(0, 1, 0), 0.5, 0);    // Initialize ball with base position (origin)
 CameraSystem camera = CameraSystem();              // Initialize camera system
 Board gameBoard = Board(Vec3D(0, 0, 0), baseSize); // Initialize game board
@@ -168,6 +170,18 @@ void renderWalls()
 //     glPopMatrix();
 // }
 
+void renderText(int x, int y, float r, float g, float b, char *string)
+{
+    glColor3f(r, g, b);
+    glRasterPos2f(x, y);
+    int len, i;
+    len = (int)strlen(string);
+    for (i = 0; i < len; i++)
+    {
+        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, string[i]);
+    }
+}
+
 // Display Callback Function
 void display()
 {
@@ -176,6 +190,17 @@ void display()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(camera.getX(), camera.getY(), camera.getZ(), 0, 0, 0, camera.rotX, camera.rotY, camera.rotZ);
+
+    glPushMatrix();
+    renderText(-1, 12, 1, 0, 0, "Welcome");
+    renderText(-4, 11, 1, 1, 0, "Use W,A,S,D to control board");
+    renderText(-5, 10, 0, 1, 1, "Use arrow keys to control camera");
+    if (winStatus)
+    {
+        renderText(-2, 9, 1, 1, 1, "You Won");
+    }
+    glPopMatrix();
+
     glColor3f(1, 1, 1);
     //drawAxis(); <-- Helps to debug movement issues
 
@@ -228,7 +253,7 @@ bool collisionDetected(float x, float z)
     {
         posZ = round(z - football.size + baseSize / 2);
     }
-    if (Wall[posZ][posX]) // Check if a maze exists at ball's location
+    if (posX < baseSize && posZ < baseSize && Wall[posZ][posX]) // Check if a maze exists at ball's location
     {
         return true;
     }
@@ -259,10 +284,29 @@ void updateBallPosition()
     }
 }
 
-// Animate Callback Function
+bool outOfBounds()
+{
+    Point3D expectedPoint = football.nextPosition(xIncr, yIncr, zIncr); // Check where ball will be next due to current board's tilt
+    float posX = expectedPoint.x + baseSize / 2;
+    float posZ = expectedPoint.z + baseSize / 2;
+    if ((posX > baseSize || posX < 0) || (posZ > baseSize || posZ < 0))
+    {
+        return true;
+    }
+    return false;
+}
+
+// Animate Callback FunctionO
 void animate(int v)
 {
-    updateBallPosition();
+    if (!outOfBounds())
+    {
+        updateBallPosition();
+    }
+    else
+    {
+        winStatus = true;
+    }
     glutPostRedisplay();
     glutTimerFunc(timerFunc, animate, 0);
 };
