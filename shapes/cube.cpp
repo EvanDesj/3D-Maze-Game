@@ -15,20 +15,16 @@
 #include <GL/glu.h>
 #include <GL/freeglut.h>
 #endif
-// If windows, include <windows.h> to get the API functions
-#ifdef _WIN32
-#include <windows.h>
-#endif
 
 Cube::Cube(Vec3D center, Vec3D size, Vec3D rotationAngle, Colour colour, Material material)
     : Shape(center, size, rotationAngle, colour, material)
 {
-    this->center = center;
-    this->size = size;
-    this->rotationAngle = rotationAngle;
-    this->colour = colour;
-    this->material = material;
-};
+            this->center = center;
+            this->size = size;
+            this->rotationAngle = rotationAngle;
+            this->colour = colour;
+            this->material = material;
+}
 
 void Cube::draw()
 {
@@ -53,4 +49,4 @@ void Cube::draw()
     // Draw the cube
     glutSolidCube(1);
     glPopMatrix();
-};
+}

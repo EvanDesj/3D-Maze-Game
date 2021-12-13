@@ -4,17 +4,18 @@
 //include required libraries
 #include <vector>
 #include "./shapes/cube.h"
+using namespace std;
 
 class Board
 {
 public:
     Vec3D center;
     int size;
-    std::vector<std::vector<Cube>> board;
+    vector<vector<vector<Cube>>> board;
 
-    Board(Vec3D center, int size);
+    Board(Vec3D center, int size, vector<vector<int>> boardWalls);
+    Board(Vec3D center, int size, vector<vector<int>> boardWalls, vector<vector<int>> boardFloor);
     void draw();
-    void rotate(Vec3D rotate);
 };
 
 #endif

@@ -14,10 +14,6 @@ Final Project:
 #include <GL/glu.h>
 #include <GL/freeglut.h>
 #endif
-// If windows, include <windows.h> to get the API functions
-#ifdef _WIN32
-#include <windows.h>
-#endif
 
 // include standard libraries
 #include <iostream>
@@ -39,43 +35,45 @@ float xIncr = 0;
 float yIncr = 0;
 float zIncr = 0;
 // ------------------------//
-int timerFunc = 1; // Duration between animation frames, lower is better
+int timerFunc = 15; // Duration between animation frames, lower is better
 int windowWidth = 800;
 int windowHeight = 600;
 
 // Size of base board
-const int baseSize = 24;
-// Wall/Maze, 1 represents wall while 0 is empty space
-int Wall[baseSize][baseSize] = {{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-                                {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1},
-                                {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1},
-                                {1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1},
-                                {1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1},
-                                {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1},
-                                {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1},
-                                {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1},
-                                {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1},
-                                {1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1},
-                                {1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
-                                {1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
-                                {1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1},
-                                {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
-                                {1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
-                                {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1},
-                                {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
-                                {1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1},
-                                {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1},
-                                {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
-                                {1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1},
-                                {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
-                                {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
-                                {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
+const int boardSize = 24;
+
+// maze walls, 1 represents wall while 0 is empty space
+vector<vector<int>> walls = { {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+                              {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+                              {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1},
+                              {1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1},
+                              {1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1},
+                              {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1},
+                              {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1},
+                              {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1},
+                              {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1},
+                              {1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1},
+                              {1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+                              {1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+                              {1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1},
+                              {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+                              {1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+                              {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1},
+                              {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+                              {1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1},
+                              {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1},
+                              {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
+                              {1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1},
+                              {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
+                              {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
+                              {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
 
 objl::Loader BallObject;                           // Ball object where ball.obj will be loaded in
 bool fileLoaded = false;                           // Boolean to check if the ball object has been loaded or not
 Ball football = Ball(Point3D(0, 1, 0), 0.5, 0);    // Initialize ball with base position (origin)
 CameraSystem camera = CameraSystem();              // Initialize camera system
-Board gameBoard = Board(Vec3D(0, 0, 0), baseSize); // Initialize game board
+Board gameBoard = Board(Vec3D(0, 0, 0), boardSize, walls); // Initialize game board
+
 
 // Function to load ball
 void loadBall()
@@ -128,45 +126,48 @@ void renderBall()
     drawFromObj(BallObject);
 }
 
-// Function to render walls/maze
-void renderWalls()
-{
-    for (int i = 0; i < baseSize; i++)
-    {
-        for (int j = 0; j < baseSize; j++)
-        {
-            if (Wall[i][j] == 1)
-            {
-
-                glPushMatrix();
-                glTranslatef(i, 1, j); // Draw wall at position (i,j) at fixed y position
-                glutSolidCube(1.0);    // Draw cube of size 1
-                glPopMatrix();
-            }
-        }
-    }
-}
-
-// void drawAxis()
+// // Function to render walls/maze
+// void renderWalls()
 // {
-//     glPushMatrix();
-//     glLineWidth(2);
-//     glBegin(GL_LINES);
+//     for (int i = 0; i < boardSize; i++)
+//     {
+//         for (int j = 0; j < boardSize; j++)
+//         {
+//             if (walls[i][j] == 1)
+//             {
 
-//     glColor3f(1.0, 0.0, 0.0);
-//     glVertex3f(0.0, 0.0, 0.0);
-//     glVertex3f(10.0, 0.0, 0.0);
-
-//     glColor3f(1.0, 1.0, 0.0);
-//     glVertex3f(0.0, 0.0, 0.0);
-//     glVertex3f(0.0, 10.0, 0.0);
-
-//     glColor3f(0.0, 0.0, 1.0);
-//     glVertex3f(0.0, 0.0, 0.0);
-//     glVertex3f(0.0, 0.0, 10.0);
-//     glEnd();
-//     glPopMatrix();
+//                 glPushMatrix();
+//                 glTranslatef(i, 1, j); // Draw wall at position (i,j) at fixed y position
+//                 glutSolidCube(1.0);    // Draw cube of size 1
+//                 glPopMatrix();
+//             }
+//         }
+//     }
 // }
+
+void drawAxis()
+{
+    glPushMatrix();
+    glLineWidth(2);
+    glBegin(GL_LINES);
+
+    //x axis
+    glColor3f(1.0, 0.0, 0.0);
+    glVertex3f(0.0, 0.0, 0.0);
+    glVertex3f(10.0, 0.0, 0.0);
+
+    //y axis
+    glColor3f(0.0, 1.0, 0.0);
+    glVertex3f(0.0, 0.0, 0.0);
+    glVertex3f(0.0, 10.0, 0.0);
+
+    //z axis
+    glColor3f(0.0, 0.0, 1.0);
+    glVertex3f(0.0, 0.0, 0.0);
+    glVertex3f(0.0, 0.0, 10.0);
+    glEnd();
+    glPopMatrix();
+}
 
 // Display Callback Function
 void display()
@@ -177,7 +178,7 @@ void display()
     glLoadIdentity();
     gluLookAt(camera.getX(), camera.getY(), camera.getZ(), 0, 0, 0, camera.rotX, camera.rotY, camera.rotZ);
     glColor3f(1, 1, 1);
-    //drawAxis(); <-- Helps to debug movement issues
+    drawAxis(); //<-- Helps to debug movement issues
 
     // Matrix so ball and walls also move as board rotates
     glPushMatrix();
@@ -194,13 +195,13 @@ void display()
     glPopMatrix();
 
     // Add Walls
-    glPushMatrix();
-    glColor3f(1, 0, 1);
-    glTranslatef(-1 * (baseSize / 2), 0, -1 * (baseSize / 2)); // To offset maze to correct position to overlay maze over base board and fix alignment
-    glPushMatrix();
-    renderWalls();
-    glPopMatrix();
-    glPopMatrix();
+    // glPushMatrix();
+    // glColor3f(1, 0, 1);
+    // glTranslatef(-1 * (boardSize / 2), 0, -1 * (boardSize / 2)); // To offset maze to correct position to overlay maze over base board and fix alignment
+    // glPushMatrix();
+    // renderWalls();
+    // glPopMatrix();
+    // glPopMatrix();
 
     glPopMatrix();
 
@@ -214,21 +215,21 @@ bool collisionDetected(float x, float z)
     int posX, posZ = 0;
     if (xIncr < 0)
     {
-        posX = round(x - football.size + baseSize / 2);
+        posX = round(x - football.size + boardSize / 2);
     }
     else
     {
-        posX = round(x + football.size + baseSize / 2);
+        posX = round(x + football.size + boardSize / 2);
     }
     if (zIncr < 0)
     {
-        posZ = round(z + football.size + baseSize / 2);
+        posZ = round(z + football.size + boardSize / 2);
     }
     else
     {
-        posZ = round(z - football.size + baseSize / 2);
+        posZ = round(z - football.size + boardSize / 2);
     }
-    if (Wall[posZ][posX]) // Check if a maze exists at ball's location
+    if (walls[posZ][posX]) // Check if a maze exists at ball's location
     {
         return true;
     }
@@ -427,16 +428,25 @@ void specialKeyboard(int key, int x, int y)
     }
 };
 
+
 // Glut Initialization Function
 void init()
 {
-    loadBall(); // Load ball only once
+    // Load ball only once
+    loadBall();
+
     glClearColor(0.5, 0.5, 0.5, 0);
     glColor3f(1, 1, 1);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(45, 1, 1, 100);
+
+    glEnable(GL_DEPTH_TEST);
+    glFrontFace(GL_CW);
+    glCullFace(GL_FRONT);
+    glEnable(GL_CULL_FACE);
 };
+
 
 // Print Program Instructions
 void printInstructions()
@@ -464,10 +474,6 @@ int main(int argc, char **argv)
     glutDisplayFunc(display);         //registers "display" as the display callback function
     glutKeyboardFunc(keyboard);       //registers "keyboard" as the keyboard callback function
     glutSpecialFunc(specialKeyboard); //registers "specialKeyboard" as the special callback function
-    glEnable(GL_DEPTH_TEST);
-    glFrontFace(GL_CW);
-    glCullFace(GL_FRONT);
-    glEnable(GL_CULL_FACE);
     init();
     animate(1);
     glutMainLoop();
