@@ -594,8 +594,8 @@ void init()
     // Enable texturing
     glEnable(GL_TEXTURE_2D);
     glGenTextures(2, textures);
-    setTexture(0, "utils/brickTexture_2.ppm", gridWidth, gridHeight);
-    setTexture(1, "utils/floor2.ppm", floorWidth, floorHeight);
+    setTexture(0, "assets/brickTexture_2.ppm", gridWidth, gridHeight);
+    setTexture(1, "assets/floor2.ppm", floorWidth, floorHeight);
 };
 
 // Print Program Instructions
