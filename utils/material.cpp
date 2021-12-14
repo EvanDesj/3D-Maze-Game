@@ -37,7 +37,7 @@ Material::Material(char colour){
         this->shininess = 10;         
     }
     else if (colour == 'w'){
-        this->ambient = Colour(1, 1, 0.75, 1.0); //Reddish-green ambient colour
+        this->ambient = Colour(1, 0.95, 0.80, 1.0); //Reddish-green ambient colour
         this->diffuse = Colour(1, 1, 1, 1.0); //Reddish-green diffuse
         this->specular = Colour(1, 1, 1, 1.0); //Weak white highlights
         this->shininess = 0;
