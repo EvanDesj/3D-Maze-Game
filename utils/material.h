@@ -14,6 +14,7 @@ public:
 
     Material(Colour ambiant, Colour diffuse, Colour specular, float shininess);
     Material();
+    Material(char colour);
 };
 
 #endif

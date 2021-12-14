@@ -6,6 +6,9 @@
 #include "../utils/colour.h"
 #include "../utils/material.h"
 #include "../utils/mathLib3D.h"
+#  include <GL/gl.h>
+#  include <GL/glu.h>
+#  include <GL/freeglut.h>
 
 class Cube : public Shape
 {

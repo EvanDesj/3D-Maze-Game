@@ -6,6 +6,7 @@ Final Project:
 
 // Include OpenGL/GLUT Libraries
 #ifdef __APPLE__
+#define GL_SILENCE_DEPRECATION
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #include <GLUT/glut.h>
@@ -26,6 +27,7 @@ Final Project:
 #include <vector>
 #include "camera.h"
 #include "board.h"
+#include "PPM.h"
 #include "utils/objectLoader.h"
 #include "shapes/ball.h"
 #include "utils/levelManager.h"
@@ -57,6 +59,25 @@ Ball football = Ball(Point3D(0, 1, 0), 0.5, 0); // Initialize ball with base pos
 CameraSystem camera = CameraSystem();           // Initialize camera system
 FileManager fileManager = FileManager();
 string selectedLevel = "1";
+
+//Texture variables
+int gridWidth, gridHeight;
+int floorWidth, floorHeight;
+GLuint textures[1];
+
+//Lighting variables
+float light_pos0[] = {1, 2, 3};
+float light_pos1[] = {3, 3, 1};
+float amb[] = {0.15, 0.15, 0.25};
+float diff[] = {0.75, 0.68, 0.55};
+float spec[] = {0.55, 0.35, 0.45};
+Material wallMat = Material('w');
+Material ballMat = Material('w');
+Material floorMat = Material(Colour(0.12f, 0.18f, 0.25f, 1.0f),
+                             Colour(0.67f, 0.65f, 0.5f, 1.0f),
+                             Colour(0.70f, 0.70f, 0.55f, 1.0f),
+                             0.0f);
+
 vector<vector<int>> Wall = level1;
 int baseSize()
 {
@@ -110,6 +131,7 @@ void drawFromObj(objl::Loader Object)
 // Function to render ball
 void renderBall()
 {
+    glBindTexture(GL_TEXTURE_2D, 0);
     glTranslatef(football.position.z, football.position.y, football.position.x);
     glRotatef(football.rotationAngle, xIncr, yIncr, zIncr);
     glScalef(football.size, football.size, football.size);
@@ -119,6 +141,11 @@ void renderBall()
 // Function to render walls/maze
 void renderWalls()
 {
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, wallMat.ambient.getColour());
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, wallMat.diffuse.getColour());
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, wallMat.specular.getColour());
+    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 10);
+    glBindTexture(GL_TEXTURE_2D, textures[0]);
     for (int i = 0; i < baseSize(); i++)
     {
         for (int j = 0; j < baseSize(); j++)
@@ -127,12 +154,29 @@ void renderWalls()
             {
 
                 glPushMatrix();
-                glTranslatef(i, 1, j); // Draw wall at position (i,j) at fixed y position
-                glutSolidCube(1.0);    // Draw cube of size 1
+                glTranslatef(i, 1, j);      // Draw wall at position (i,j) at fixed y position
+                glEnable(GL_TEXTURE_GEN_S); //enable texture coordinate generation
+                glEnable(GL_TEXTURE_GEN_T);
+                glutSolidCube(1);            // Draw cube of size 1
+                glDisable(GL_TEXTURE_GEN_S); //enable texture coordinate generation
+                glDisable(GL_TEXTURE_GEN_T);
                 glPopMatrix();
             }
         }
     }
+}
+void renderFloor()
+{
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, floorMat.ambient.getColour());
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, floorMat.diffuse.getColour());
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, floorMat.specular.getColour());
+    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 10);
+    glBindTexture(GL_TEXTURE_2D, textures[1]);
+    glEnable(GL_TEXTURE_GEN_S); //enable texture coordinate generation
+    glEnable(GL_TEXTURE_GEN_T);
+    gameBoard.draw();
+    glDisable(GL_TEXTURE_GEN_S); //enable texture coordinate generation
+    glDisable(GL_TEXTURE_GEN_T);
 }
 
 void startTimer()
@@ -143,26 +187,6 @@ void startTimer()
         timerStarted = true;
     }
 }
-// void drawAxis()
-// {
-//     glPushMatrix();
-//     glLineWidth(2);
-//     glBegin(GL_LINES);
-
-//     glColor3f(1.0, 0.0, 0.0);
-//     glVertex3f(0.0, 0.0, 0.0);
-//     glVertex3f(10.0, 0.0, 0.0);
-
-//     glColor3f(1.0, 1.0, 0.0);
-//     glVertex3f(0.0, 0.0, 0.0);
-//     glVertex3f(0.0, 10.0, 0.0);
-
-//     glColor3f(0.0, 0.0, 1.0);
-//     glVertex3f(0.0, 0.0, 0.0);
-//     glVertex3f(0.0, 0.0, 10.0);
-//     glEnd();
-//     glPopMatrix();
-// }
 
 void renderText(int x, int y, float r, float g, float b, string stringInput)
 {
@@ -174,6 +198,20 @@ void renderText(int x, int y, float r, float g, float b, string stringInput)
     {
         glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, stringInput[i]);
     }
+}
+
+//sets lighting parameters
+void setLighting()
+{
+    glLightfv(GL_LIGHT0, GL_POSITION, light_pos0);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, amb);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, diff);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, spec);
+
+    glLightfv(GL_LIGHT1, GL_POSITION, light_pos1);
+    glLightfv(GL_LIGHT1, GL_AMBIENT, amb);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, diff);
+    glLightfv(GL_LIGHT1, GL_SPECULAR, spec);
 }
 
 // Display Callback Function
@@ -203,22 +241,25 @@ void display()
     }
 
     glPopMatrix();
-
+    glEnable(GL_LIGHTING);
     glColor3f(1, 1, 1);
-    //drawAxis(); <-- Helps to debug movement issues
 
     // Matrix so ball and walls also move as board rotates
     glPushMatrix();
+    // Activate lighting
+    setLighting();
 
     // Add Gameboard
     glRotatef(0 + xIncr, 1, 0, 0);
     glRotatef(0 + yIncr, 0, 1, 0);
     glRotatef(0 + zIncr, 0, 0, 1);
-    gameBoard.draw();
+    renderFloor();
 
-    //Adding Ball
+    //Add Ball
     glPushMatrix();
+    glDisable(GL_LIGHTING);
     renderBall();
+    glEnable(GL_LIGHTING);
     glPopMatrix();
 
     // Add Walls
@@ -523,15 +564,38 @@ void specialKeyboard(int key, int x, int y)
     }
 };
 
+//set texture parameters
+void setTexture(int i, const char *name, int width, int height)
+{
+    GLubyte *img_data = LoadPPM(name, &width, &height);
+    glBindTexture(GL_TEXTURE_2D, textures[i]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+                 GL_UNSIGNED_BYTE, img_data);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+}
+
 // Glut Initialization Function
 void init()
 {
     loadBall(); // Load ball only once
-    glClearColor(0.5, 0.5, 0.5, 0);
+    glClearColor(0.55, 0.50, 0.46, 0);
     glColor3f(1, 1, 1);
+    // Enable Lighting
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHT1);
+
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(45, 1, 1, 100);
+    // Enable texturing
+    glEnable(GL_TEXTURE_2D);
+    glGenTextures(2, textures);
+    setTexture(0, "utils/brickTexture_2.ppm", gridWidth, gridHeight);
+    setTexture(1, "utils/floor2.ppm", floorWidth, floorHeight);
 };
 
 // Print Program Instructions
@@ -561,6 +625,7 @@ int main(int argc, char **argv)
     glutDisplayFunc(display);         //registers "display" as the display callback function
     glutKeyboardFunc(keyboard);       //registers "keyboard" as the keyboard callback function
     glutSpecialFunc(specialKeyboard); //registers "specialKeyboard" as the special callback function
+
     glEnable(GL_DEPTH_TEST);
     glFrontFace(GL_CW);
     glCullFace(GL_FRONT);
