@@ -15,6 +15,7 @@ public:
     Board(Vec3D center, int size);
     void draw();
     void rotate(Vec3D rotate);
+    void drawBox();
 };
 
 #endif
