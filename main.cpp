@@ -51,13 +51,14 @@ int windowHeight = 600;
 
 objl::Loader BallObject;        // Ball object where ball.obj will be loaded in
 bool ballTextureLoaded = false; // Boolean to check if the ball object has been loaded or not
-bool winStatus = false;
+bool completionStatus = false;
 std::chrono::steady_clock::time_point beginTime = std::chrono::steady_clock::now();
 bool timerStarted = false;
 float timeElapsed = 0;
 Ball football = Ball(Point3D(0, 1, 0), 0.5, 0); // Initialize ball with base position (origin)
 CameraSystem camera = CameraSystem();           // Initialize camera system
 FileManager fileManager = FileManager();
+unordered_map<string, float> highScores = fileManager.getHighScores();
 string selectedLevel = "1";
 
 //Texture variables
@@ -214,6 +215,56 @@ void setLighting()
     glLightfv(GL_LIGHT1, GL_SPECULAR, spec);
 }
 
+bool highScoreBeat()
+{
+    if (highScores[selectedLevel] == 0)
+    {
+        return true;
+    }
+    if (completionStatus && timeElapsed > 0 && timeElapsed < highScores[selectedLevel])
+    {
+        return true;
+    }
+    return false;
+}
+
+void screenText()
+{
+    glPushMatrix();
+    renderText(-1, 12, 1, 0, 0, "Welcome");
+    renderText(-4, 11, 1, 1, 0, "Use W,A,S,D to control board");
+    renderText(-5, 10, 0, 1, 1, "Use arrow keys to control camera");
+    if (highScores[selectedLevel] != 0)
+    {
+        float targetScore = highScores[selectedLevel];
+        renderText(-3, 9, 1, 1, 1, "Level: " + selectedLevel + " | Time to beat: " + to_string(targetScore));
+    }
+    else
+    {
+        renderText(-3, 9, 1, 1, 1, "Level: " + selectedLevel);
+    }
+    if (timeElapsed > 0)
+    {
+        char timeElapsedArray[10];
+        sprintf(timeElapsedArray, "%f", timeElapsed);
+        if (!completionStatus)
+        {
+            renderText(-2, 8, 1, 1, 1, "Time elapsed: " + (string)timeElapsedArray + " seconds");
+        }
+        else
+        {
+            if (highScoreBeat())
+            {
+                renderText(-2, 8, 0, 0, 0, "You Won. You took: " + (string)timeElapsedArray + " seconds");
+            }
+            else
+            {
+                renderText(-2, 8, 0, 0, 0, "You didn't win. You took: " + (string)timeElapsedArray + " seconds");
+            }
+        }
+    }
+    glPopMatrix();
+}
 // Display Callback Function
 void display()
 {
@@ -222,25 +273,7 @@ void display()
     glLoadIdentity();
     gluLookAt(camera.getX(), camera.getY(), camera.getZ(), 0, 0, 0, camera.rotX, camera.rotY, camera.rotZ);
 
-    glPushMatrix();
-    renderText(-1, 12, 1, 0, 0, "Welcome");
-    renderText(-4, 11, 1, 1, 0, "Use W,A,S,D to control board");
-    renderText(-5, 10, 0, 1, 1, "Use arrow keys to control camera");
-    renderText(-3, 9, 1, 1, 1, "Level: " + selectedLevel);
-    if (!winStatus && timeElapsed > 0)
-    {
-        char timeElapsedArray[10];
-        sprintf(timeElapsedArray, "%f", timeElapsed);
-        renderText(-2, 8, 1, 1, 1, "Time elapsed: " + (string)timeElapsedArray + " seconds");
-    }
-    if (winStatus && timeElapsed > 0)
-    {
-        char timeElapsedArray[10];
-        sprintf(timeElapsedArray, "%f", timeElapsed);
-        renderText(-2, 8, 0, 0, 0, "You Won. You took: " + (string)timeElapsedArray + " seconds");
-    }
-
-    glPopMatrix();
+    screenText();
     glEnable(GL_LIGHTING);
     glColor3f(1, 1, 1);
 
@@ -343,7 +376,7 @@ bool outOfBounds()
 // Animate Callback FunctionO
 void animate(int v)
 {
-    if (timerStarted && !winStatus)
+    if (timerStarted && !completionStatus)
     {
         std::chrono::steady_clock::time_point endTime = std::chrono::steady_clock::now();
         timeElapsed = (std::chrono::duration_cast<std::chrono::microseconds>(endTime - beginTime).count()) / 1000000.0;
@@ -354,8 +387,10 @@ void animate(int v)
     }
     else
     {
-        winStatus = true;
-        fileManager.saveHighScore(selectedLevel, timeElapsed);
+        completionStatus = true;
+        if(highScoreBeat()){
+            fileManager.saveHighScore(selectedLevel, timeElapsed);
+        }
     }
     glutPostRedisplay();
     glutTimerFunc(timerFunc, animate, 0);
@@ -385,11 +420,12 @@ void boardReset()
     football.position.z = 0;
     football.position.y = 1;
     football.position.x = 0;
-    winStatus = false;
+    completionStatus = false;
     beginTime = std::chrono::steady_clock::now();
     timerStarted = false;
     timeElapsed = 0;
     gameBoard = Board(Vec3D(0, 0, 0), baseSize()); // Reinitialize game board
+    highScores = fileManager.getHighScores();
     fileManager.reset();
 }
 
@@ -615,7 +651,6 @@ void printInstructions()
 // Main program
 int main(int argc, char **argv)
 {
-    fileManager.getHighScores();
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(800, 800);

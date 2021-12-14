@@ -13,11 +13,10 @@ class FileManager
 private:
     void prettyPrintLevel();
     bool highScoreSaved = false;
-    unordered_map<string, float> levelScores;
 public:
     FileManager();
     vector<vector<int>> loadedLevel;
-    bool getHighScores();
+    unordered_map<string, float> getHighScores();
     bool saveHighScore(string level, float score);
     bool loadLevel();
     void reset();

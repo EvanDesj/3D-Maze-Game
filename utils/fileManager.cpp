@@ -12,36 +12,53 @@ bool FileManager::saveHighScore(string level, float score)
         return false;
     }
     highScoreSaved = true;
-    // getHighScores();
+    unordered_map<string, float> scores = getHighScores();
     ofstream MyFile("save.txt");
     if (MyFile.fail())
     {
         return false;
     }
-    MyFile << level << "|" << score << endl;
+    scores[level] = score;
+    for (auto i : scores)
+    {
+        string levelName = i.first;
+        float levelScore = i.second;
+        if (levelName == "Custom")
+        {
+            levelName = "c";
+        }
+        MyFile << levelName << "|" << levelScore << endl;
+    }
     MyFile.close();
     return true;
 }
 
-bool FileManager::getHighScores(){
+unordered_map<string, float> FileManager::getHighScores()
+{
     string myText;
     ifstream MyReadFile("save.txt");
-    if (MyReadFile.fail())
+    unordered_map<string, float> levelScores;
+    levelScores["1"] = 0;
+    levelScores["2"] = 0;
+    levelScores["3"] = 0;
+    levelScores["4"] = 0;
+    levelScores["Custom"] = 0;
+    if (!MyReadFile.fail())
     {
-        return false;
+        while (getline(MyReadFile, myText))
+        {
+            string level, score;
+            level = myText[0];
+            if (level == "c")
+            {
+                level = "Custom";
+            }
+            score = myText.substr(2);
+            levelScores[level] = stof(score);
+        }
+        MyReadFile.close();
     }
-    levelScores.clear();
-    while (getline(MyReadFile, myText))
-    {
-        std::string s = myText;
-        std::string delimiter = "|";
-        std::string level = s.substr(0, s.find(delimiter));
-        std::string score = s.substr(2, s.find(delimiter));
-        cout<<level<<","<<score<<endl;
-        levelScores.insert(std::make_pair(level, std::stof(score)));
-    }
-    MyReadFile.close();
-    return true;
+    return levelScores;
 }
 
 bool FileManager::loadLevel()
