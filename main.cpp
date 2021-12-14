@@ -27,7 +27,7 @@ Final Project:
 #include <vector>
 #include "camera.h"
 #include "board.h"
-#include "PPM.h"
+#include "utils/PPM.h"
 #include "utils/objectLoader.h"
 #include "shapes/ball.h"
 #include "utils/levelManager.h"
