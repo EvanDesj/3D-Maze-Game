@@ -5,6 +5,7 @@
 #include <vector>
 #include <sstream>
 #include <iostream>
+#include <unordered_map>
 using namespace std;
 
 class FileManager
@@ -12,10 +13,12 @@ class FileManager
 private:
     void prettyPrintLevel();
     bool highScoreSaved = false;
+    unordered_map<string, float> levelScores;
 public:
     FileManager();
     vector<vector<int>> loadedLevel;
-    bool saveHighScore(float score);
+    bool getHighScores();
+    bool saveHighScore(string level, float score);
     bool loadLevel();
     void reset();
 };

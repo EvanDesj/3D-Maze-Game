@@ -5,28 +5,42 @@ FileManager::FileManager()
     return;
 }
 
-bool FileManager::saveHighScore(float score)
+bool FileManager::saveHighScore(string level, float score)
 {
     if (highScoreSaved)
     {
         return false;
     }
     highScoreSaved = true;
-    string name = "";
-    cout << "Type your name to save highscore, enter N to cancel: ";
-    getline(cin, name);
-    if (name == "N" || name == "n")
-    {
-        cout<<"High score not saved";
-        return false;
-    }
-    ofstream MyFile("save.txt", std::ios_base::app);
+    // getHighScores();
+    ofstream MyFile("save.txt");
     if (MyFile.fail())
     {
         return false;
     }
-    MyFile << name << "|" << score << endl;
+    MyFile << level << "|" << score << endl;
     MyFile.close();
+    return true;
+}
+
+bool FileManager::getHighScores(){
+    string myText;
+    ifstream MyReadFile("save.txt");
+    if (MyReadFile.fail())
+    {
+        return false;
+    }
+    levelScores.clear();
+    while (getline(MyReadFile, myText))
+    {
+        std::string s = myText;
+        std::string delimiter = "|";
+        std::string level = s.substr(0, s.find(delimiter));
+        std::string score = s.substr(2, s.find(delimiter));
+        cout<<level<<","<<score<<endl;
+        levelScores.insert(std::make_pair(level, std::stof(score)));
+    }
+    MyReadFile.close();
     return true;
 }
 

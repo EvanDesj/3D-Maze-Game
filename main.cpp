@@ -56,7 +56,7 @@ float timeElapsed = 0;
 Ball football = Ball(Point3D(0, 1, 0), 0.5, 0); // Initialize ball with base position (origin)
 CameraSystem camera = CameraSystem();           // Initialize camera system
 FileManager fileManager = FileManager();
-
+string selectedLevel = "1";
 vector<vector<int>> Wall = level1;
 int baseSize()
 {
@@ -164,15 +164,15 @@ void startTimer()
 //     glPopMatrix();
 // }
 
-void renderText(int x, int y, float r, float g, float b, char *string)
+void renderText(int x, int y, float r, float g, float b, string stringInput)
 {
     glColor3f(r, g, b);
     glRasterPos2f(x, y);
     int len, i;
-    len = (int)strlen(string);
+    len = (int)stringInput.length();
     for (i = 0; i < len; i++)
     {
-        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, string[i]);
+        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, stringInput[i]);
     }
 }
 
@@ -185,19 +185,23 @@ void display()
     gluLookAt(camera.getX(), camera.getY(), camera.getZ(), 0, 0, 0, camera.rotX, camera.rotY, camera.rotZ);
 
     glPushMatrix();
-    renderText(-1, 12, 1, 0, 0, (char *)"Welcome");
-    renderText(-4, 11, 1, 1, 0, (char *)"Use W,A,S,D to control board");
-    renderText(-5, 10, 0, 1, 1, (char *)"Use arrow keys to control camera");
-    if (timeElapsed > 0)
+    renderText(-1, 12, 1, 0, 0, "Welcome");
+    renderText(-4, 11, 1, 1, 0, "Use W,A,S,D to control board");
+    renderText(-5, 10, 0, 1, 1, "Use arrow keys to control camera");
+    renderText(-3, 9, 1, 1, 1, "Level: " + selectedLevel);
+    if (!winStatus && timeElapsed > 0)
     {
         char timeElapsedArray[10];
         sprintf(timeElapsedArray, "%f", timeElapsed);
-        renderText(-2, 9, 1, 1, 1, timeElapsedArray);
+        renderText(-2, 8, 1, 1, 1, "Time elapsed: " + (string)timeElapsedArray + " seconds");
     }
-    if (winStatus)
+    if (winStatus && timeElapsed > 0)
     {
-        renderText(-2, 8, 0, 0, 0, (char *)"You Won");
+        char timeElapsedArray[10];
+        sprintf(timeElapsedArray, "%f", timeElapsed);
+        renderText(-2, 8, 0, 0, 0, "You Won. You took: " + (string)timeElapsedArray + " seconds");
     }
+
     glPopMatrix();
 
     glColor3f(1, 1, 1);
@@ -303,7 +307,6 @@ void animate(int v)
         std::chrono::steady_clock::time_point endTime = std::chrono::steady_clock::now();
         timeElapsed = (std::chrono::duration_cast<std::chrono::microseconds>(endTime - beginTime).count()) / 1000000.0;
     }
-
     if (!outOfBounds())
     {
         updateBallPosition();
@@ -311,9 +314,7 @@ void animate(int v)
     else
     {
         winStatus = true;
-        if(fileManager.saveHighScore(timeElapsed)){
-            cout<<"High score saved"<<endl;
-        };
+        fileManager.saveHighScore(selectedLevel, timeElapsed);
     }
     glutPostRedisplay();
     glutTimerFunc(timerFunc, animate, 0);
@@ -358,26 +359,30 @@ void keyboard(unsigned char key, int x, int y)
     {
     case '1':
         Wall = level1;
+        selectedLevel = "1";
         boardReset();
         break;
     case '2':
         Wall = level2;
+        selectedLevel = "2";
         boardReset();
         break;
     case '3':
         Wall = level3;
+        selectedLevel = "3";
         boardReset();
         break;
     case '5':
-        // Wall = level3;
-        // boardReset();
-        if(fileManager.loadLevel()){
+        selectedLevel = "Custom";
+        if (fileManager.loadLevel())
+        {
             Wall = fileManager.loadedLevel;
             boardReset();
-            cout<<"Board loaded from external file"<<endl;
+            cout << "Board loaded from external file" << endl;
         }
-        else{
-            cout<<"Please place a file in root directory titled board.txt. Refer to readme for more information."<<endl;
+        else
+        {
+            cout << "Please place a file in root directory titled board.txt. Refer to readme for more information." << endl;
         }
         break;
     case 27:
@@ -546,6 +551,7 @@ void printInstructions()
 // Main program
 int main(int argc, char **argv)
 {
+    fileManager.getHighScores();
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(800, 800);
