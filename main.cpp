@@ -67,11 +67,16 @@ int floorWidth, floorHeight;
 GLuint textures[1];
 
 //Lighting variables
-float light_pos0[] = {1, 2, 3};
-float light_pos1[] = {3, 3, 1};
-float amb[] = {0.15, 0.15, 0.25};
-float diff[] = {0.75, 0.68, 0.55};
-float spec[] = {0.55, 0.35, 0.45};
+float light_pos0[] = {-7, 3, -1};
+float light_pos1[] = {7, 10, -2};
+float amb[] = {0.18, 0.19, 0.25};
+float diff[] = {0.75, 0.62, 0.55};
+float spec[] = {0.55, 0.45, 0.55};
+
+float amb2[] = {0.20, 0.18, 0.15};
+float diff2[] = {0.37, 0.37, 0.20};
+float spec2[] = {0.26, 0.17, 0.20};
+//Material variables
 Material wallMat = Material('w');
 Material ballMat = Material('w');
 Material floorMat = Material(Colour(0.12f, 0.18f, 0.25f, 1.0f),
@@ -80,22 +85,19 @@ Material floorMat = Material(Colour(0.12f, 0.18f, 0.25f, 1.0f),
                              0.0f);
 
 vector<vector<int>> Wall = level1;
-int baseSize()
-{
+int baseSize() {
     return Wall.size();
 }
 
 Board gameBoard = Board(Vec3D(0, 0, 0), baseSize()); // Initialize game board
 
 // Function to load ball
-void loadBall()
-{
+void loadBall() {
     ballTextureLoaded = BallObject.LoadFile("shapes/ball.obj");
 }
 
 // Function to render loaded object
-void drawFromObj(objl::Loader Object)
-{
+void drawFromObj(objl::Loader Object) {
     if (ballTextureLoaded) // Only render if the object has been loaded
     {
         for (int i = 0; i < Object.LoadedMeshes.size(); i++)
@@ -139,9 +141,52 @@ void renderBall()
     drawFromObj(BallObject);
 }
 
+void drawBox(GLfloat size) {
+  static GLfloat n[6][3] =
+  {
+    {-1.0, 0.0, 0.0},
+    {0.0, 1.0, 0.0},
+    {1.0, 0.0, 0.0},
+    {0.0, -1.0, 0.0},
+    {0.0, 0.0, 1.0},
+    {0.0, 0.0, -1.0}
+  };
+  static GLint faces[6][4] =
+  {
+    {0, 1, 2, 3},
+    {3, 2, 6, 7},
+    {7, 6, 5, 4},
+    {4, 5, 1, 0},
+    {5, 6, 2, 1},
+    {7, 4, 0, 3}
+  };
+  GLfloat v[8][3];
+  GLint i;
+
+  v[0][0] = v[1][0] = v[2][0] = v[3][0] = -size / 2;
+  v[4][0] = v[5][0] = v[6][0] = v[7][0] = size / 2;
+  v[0][1] = v[1][1] = v[4][1] = v[5][1] = -size / 2;
+  v[2][1] = v[3][1] = v[6][1] = v[7][1] = size / 2;
+  v[0][2] = v[3][2] = v[4][2] = v[7][2] = -size / 2;
+  v[1][2] = v[2][2] = v[5][2] = v[6][2] = size / 2;
+
+  for (i = 5; i >= 0; i--) {
+    glBegin(GL_POLYGON);
+    glNormal3fv(&n[i][0]);
+    glTexCoord2f(1,1);
+    glVertex3fv(&v [ faces[i][0] ] [0]);
+    glTexCoord2f(1,0);
+    glVertex3fv(&v[faces[i][1]][0]);
+    glTexCoord2f(0,0);
+    glVertex3fv(&v[faces[i][2]][0]);
+    glTexCoord2f(0,1);
+    glVertex3fv(&v[faces[i][3]][0]);
+    glEnd();
+  }
+}
+
 // Function to render walls/maze
-void renderWalls()
-{
+void renderWalls() {
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, wallMat.ambient.getColour());
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, wallMat.diffuse.getColour());
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, wallMat.specular.getColour());
@@ -153,14 +198,9 @@ void renderWalls()
         {
             if (Wall[i][j] == 1)
             {
-
                 glPushMatrix();
                 glTranslatef(i, 1, j);      // Draw wall at position (i,j) at fixed y position
-                glEnable(GL_TEXTURE_GEN_S); //enable texture coordinate generation
-                glEnable(GL_TEXTURE_GEN_T);
-                glutSolidCube(1);            // Draw cube of size 1
-                glDisable(GL_TEXTURE_GEN_S); //enable texture coordinate generation
-                glDisable(GL_TEXTURE_GEN_T);
+                drawBox(1);            // Draw cube of size 1
                 glPopMatrix();
             }
         }
@@ -210,13 +250,12 @@ void setLighting()
     glLightfv(GL_LIGHT0, GL_SPECULAR, spec);
 
     glLightfv(GL_LIGHT1, GL_POSITION, light_pos1);
-    glLightfv(GL_LIGHT1, GL_AMBIENT, amb);
-    glLightfv(GL_LIGHT1, GL_DIFFUSE, diff);
-    glLightfv(GL_LIGHT1, GL_SPECULAR, spec);
+    glLightfv(GL_LIGHT1, GL_AMBIENT, amb2);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, diff2);
+    glLightfv(GL_LIGHT1, GL_SPECULAR, spec2);
 }
 
-bool highScoreBeat()
-{
+bool highScoreBeat() {
     if (highScores[selectedLevel] == 0)
     {
         return true;
@@ -228,12 +267,11 @@ bool highScoreBeat()
     return false;
 }
 
-void screenText()
-{
+void screenText() {
     glPushMatrix();
-    renderText(-1, 12, 1, 0, 0, "Welcome");
-    renderText(-4, 11, 1, 1, 0, "Use W,A,S,D to control board");
-    renderText(-5, 10, 0, 1, 1, "Use arrow keys to control camera");
+    renderText(-1, 12, 1, 0.5, 0.25, "Welcome");
+    renderText(-4, 11, 1, 1, 0.25, "Use W,A,S,D to control board");
+    renderText(-5, 10, 0.5, 1, 1, "Use arrow keys to control camera");
     if (highScores[selectedLevel] != 0)
     {
         float targetScore = highScores[selectedLevel];
@@ -265,9 +303,9 @@ void screenText()
     }
     glPopMatrix();
 }
+
 // Display Callback Function
-void display()
-{
+void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -311,8 +349,7 @@ void display()
 };
 
 // Function to detect collision
-bool collisionDetected(float x, float z)
-{
+bool collisionDetected(float x, float z) {
     int posX, posZ = 0;
     if (xIncr < 0)
     {
@@ -338,8 +375,7 @@ bool collisionDetected(float x, float z)
 }
 
 // Function to update ball's position
-void updateBallPosition()
-{
+void updateBallPosition() {
     Point3D expectedPoint = football.nextPosition(xIncr, yIncr, zIncr); // Check where ball will be next due to current board's tilt
     if (!collisionDetected(expectedPoint.x, expectedPoint.z))
     {
@@ -361,8 +397,7 @@ void updateBallPosition()
     }
 }
 
-bool outOfBounds()
-{
+bool outOfBounds() {
     Point3D expectedPoint = football.nextPosition(xIncr, yIncr, zIncr); // Check where ball will be next due to current board's tilt
     float posX = expectedPoint.x + baseSize() / 2;
     float posZ = expectedPoint.z + baseSize() / 2;
@@ -374,8 +409,7 @@ bool outOfBounds()
 }
 
 // Animate Callback FunctionO
-void animate(int v)
-{
+void animate(int v) {
     if (timerStarted && !completionStatus)
     {
         std::chrono::steady_clock::time_point endTime = std::chrono::steady_clock::now();
@@ -397,14 +431,12 @@ void animate(int v)
 };
 
 // Reshape Callback Function
-void reshape(int width, int height)
-{
+void reshape(int width, int height) {
     windowWidth = width;
     windowHeight = height;
 };
 
-Vec3D computeTiltDirection()
-{
+Vec3D computeTiltDirection() {
     Point3D cameraPos = Point3D(camera.getX(), camera.getY(), camera.getZ());
     Point3D center = Point3D(0, 0, 0);
     Vec3D ray = Vec3D::createVector(cameraPos, center);
@@ -412,8 +444,7 @@ Vec3D computeTiltDirection()
     return ray;
 }
 
-void boardReset()
-{
+void boardReset() {
     xIncr = 0;
     yIncr = 0;
     zIncr = 0;
@@ -430,8 +461,7 @@ void boardReset()
 }
 
 // Keyboard Callback Function
-void keyboard(unsigned char key, int x, int y)
-{
+void keyboard(unsigned char key, int x, int y) {
     switch (key)
     {
     case '1':
@@ -579,8 +609,7 @@ void keyboard(unsigned char key, int x, int y)
 };
 
 // Special Keyboard Callback Function
-void specialKeyboard(int key, int x, int y)
-{
+void specialKeyboard(int key, int x, int y) {
     switch (key)
     {
     case GLUT_KEY_UP:
@@ -601,8 +630,7 @@ void specialKeyboard(int key, int x, int y)
 };
 
 //set texture parameters
-void setTexture(int i, const char *name, int width, int height)
-{
+void setTexture(int i, const char *name, int width, int height) {
     GLubyte *img_data = LoadPPM(name, &width, &height);
     glBindTexture(GL_TEXTURE_2D, textures[i]);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
@@ -614,10 +642,9 @@ void setTexture(int i, const char *name, int width, int height)
 }
 
 // Glut Initialization Function
-void init()
-{
+void init() {
     loadBall(); // Load ball only once
-    glClearColor(0.55, 0.50, 0.46, 0);
+    glClearColor(0.09, 0.11, 0.14, 0);
     glColor3f(1, 1, 1);
     // Enable Lighting
     glEnable(GL_LIGHTING);
@@ -635,8 +662,7 @@ void init()
 };
 
 // Print Program Instructions
-void printInstructions()
-{
+void printInstructions() {
     using namespace std;
     cout << "Program Instructions:" << endl;
     cout << "Use q to close the program at any time." << endl;
