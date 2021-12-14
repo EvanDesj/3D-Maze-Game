@@ -29,6 +29,7 @@ Final Project:
 #include "utils/objectLoader.h"
 #include "shapes/ball.h"
 #include "utils/levelManager.h"
+#include "utils/fileManager.h"
 #include <string.h>
 #include <chrono>
 using namespace std;
@@ -54,6 +55,7 @@ bool timerStarted = false;
 float timeElapsed = 0;
 Ball football = Ball(Point3D(0, 1, 0), 0.5, 0); // Initialize ball with base position (origin)
 CameraSystem camera = CameraSystem();           // Initialize camera system
+FileManager fileManager = FileManager();
 
 vector<vector<int>> Wall = level1;
 int baseSize()
@@ -177,12 +179,6 @@ void renderText(int x, int y, float r, float g, float b, char *string)
 // Display Callback Function
 void display()
 {
-    // Clear and prepare
-    if (timerStarted && !winStatus)
-    {
-        std::chrono::steady_clock::time_point endTime = std::chrono::steady_clock::now();
-        timeElapsed = (std::chrono::duration_cast<std::chrono::microseconds>(endTime - beginTime).count()) / 1000000.0;
-    }
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -302,6 +298,12 @@ bool outOfBounds()
 // Animate Callback FunctionO
 void animate(int v)
 {
+    if (timerStarted && !winStatus)
+    {
+        std::chrono::steady_clock::time_point endTime = std::chrono::steady_clock::now();
+        timeElapsed = (std::chrono::duration_cast<std::chrono::microseconds>(endTime - beginTime).count()) / 1000000.0;
+    }
+
     if (!outOfBounds())
     {
         updateBallPosition();
@@ -309,6 +311,9 @@ void animate(int v)
     else
     {
         winStatus = true;
+        if(fileManager.saveHighScore(timeElapsed)){
+            cout<<"High score saved"<<endl;
+        };
     }
     glutPostRedisplay();
     glutTimerFunc(timerFunc, animate, 0);
@@ -343,6 +348,7 @@ void boardReset()
     timerStarted = false;
     timeElapsed = 0;
     gameBoard = Board(Vec3D(0, 0, 0), baseSize()); // Reinitialize game board
+    fileManager.reset();
 }
 
 // Keyboard Callback Function
@@ -361,6 +367,18 @@ void keyboard(unsigned char key, int x, int y)
     case '3':
         Wall = level3;
         boardReset();
+        break;
+    case '5':
+        // Wall = level3;
+        // boardReset();
+        if(fileManager.loadLevel()){
+            Wall = fileManager.loadedLevel;
+            boardReset();
+            cout<<"Board loaded from external file"<<endl;
+        }
+        else{
+            cout<<"Please place a file in root directory titled board.txt. Refer to readme for more information."<<endl;
+        }
         break;
     case 27:
     case 'q':
