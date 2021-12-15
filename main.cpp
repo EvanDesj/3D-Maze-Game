@@ -94,12 +94,14 @@ int baseSize() {
 Board gameBoard = Board(Vec3D(0, 0, 0), baseSize(), Wall);
 
 // Function to load ball
-void loadBall() {
+void loadBall()
+{
     ballTextureLoaded = BallObject.LoadFile("shapes/ball.obj");
 }
 
 // Function to render loaded object
-void drawFromObj(objl::Loader Object) {
+void drawFromObj(objl::Loader Object)
+{
     if (ballTextureLoaded) // Only render if the object has been loaded
     {
         for (int i = 0; i < Object.LoadedMeshes.size(); i++)
@@ -152,9 +154,8 @@ void startTimer()
     }
 }
 
-void renderText(int x, int y, float r, float g, float b, string stringInput)
+void renderText(int x, int y, string stringInput)
 {
-    glColor3f(r, g, b);
     glRasterPos2f(x, y);
     int len, i;
     len = (int)stringInput.length();
@@ -275,18 +276,17 @@ void screenText()
     glBindTexture(GL_TEXTURE_2D, 0);
     float baseHeight = (float)windowHeight / 4;
     float widthOffset = 10;
-    // renderText(widthOffset, baseHeight - 100, "left: " + boolToText(allowedLeft()) + " , right: " + boolToText(allowedRight()) + " , up: " + boolToText(allowedUp()) + " , down: " + boolToText(allowedDown()));
-    renderText(widthOffset, baseHeight, 1, 1, 1, "Welcome");
-    renderText(widthOffset, baseHeight - 20, 1, 1, 1, "Use W,A,S,D to control board");
-    renderText(widthOffset, baseHeight - 40, 1, 1, 1, "Use arrow keys to control camera");
+    renderText(widthOffset, baseHeight, "Welcome");
+    renderText(widthOffset, baseHeight - 20, "Use W,A,S,D to control board");
+    renderText(widthOffset, baseHeight - 40, "Use arrow keys to control camera");
     if (highScores[selectedLevel] != 0)
     {
         float targetScore = highScores[selectedLevel];
-        renderText(-3, 9, 1, 1, 1, "Level: " + selectedLevel + " | Time to beat: " + to_string(targetScore));
+        renderText(widthOffset, baseHeight - 60, "Level: " + selectedLevel + " | Time to beat: " + to_string(targetScore));
     }
     else
     {
-        renderText(-3, 9, 1, 1, 1, "Level: " + selectedLevel);
+        renderText(widthOffset, baseHeight - 60, "Level: " + selectedLevel);
     }
     if (timeElapsed > 0)
     {
@@ -294,21 +294,20 @@ void screenText()
         sprintf(timeElapsedArray, "%.2f", timeElapsed);
         if (!completionStatus)
         {
-            renderText(-2, 8, 1, 1, 1, "Time elapsed: " + (string)timeElapsedArray + " seconds");
+            renderText(widthOffset, baseHeight - 80, "Time elapsed: " + (string)timeElapsedArray + " seconds");
         }
         else
         {
             if (highScoreBeat())
             {
-                renderText(-2, 8, 0, 0, 0, "You Won. You took: " + (string)timeElapsedArray + " seconds");
+                renderText(widthOffset, baseHeight - 80, "You Won. You took: " + (string)timeElapsedArray + " seconds");
             }
             else
             {
-                renderText(-2, 8, 0, 0, 0, "You didn't win. You took: " + (string)timeElapsedArray + " seconds");
+                renderText(widthOffset, baseHeight - 80, "You didn't win. You took: " + (string)timeElapsedArray + " seconds");
             }
         }
     }
-    glPopMatrix();
 }
 
 void drawAxis()
@@ -336,13 +335,15 @@ void drawAxis()
 }
 
 // Display Callback Function
-void display() {
+void display()
+{
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(camera.getX(), camera.getY(), camera.getZ(), 0, 0, 0, camera.rotX, camera.rotY, camera.rotZ);
 
-    screenText();
+    glEnable(GL_LIGHTING);
+    glColor3f(1, 1, 1);
 
     // Matrix so ball and walls also move as board rotates
     glPushMatrix();
@@ -366,16 +367,44 @@ void display() {
 
     glPopMatrix();
 
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0, windowWidth, 0, windowHeight);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    screenText();
+
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+
     // Swap Buffers
     glutSwapBuffers();
 };
 
-bool outOfBounds()
+// Function to detect collision
+bool collisionDetected(float x, float z)
 {
-    // Point3D expectedPoint = football.nextPosition(xIncr, yIncr, zIncr, Wall); // Check where ball will be next due to current board's tilt
-    float posX = football.position.x + baseSize() / 2;
-    float posZ = football.position.z + baseSize() / 2;
-    if ((posX > baseSize() || posX < 0) || (posZ > baseSize() || posZ < 0))
+    int posX, posZ = 0;
+    if (xIncr < 0)
+    {
+        posX = round(x - football.size + baseSize() / 2);
+    }
+    else
+    {
+        posX = round(x + football.size + baseSize() / 2);
+    }
+    if (zIncr < 0)
+    {
+        posZ = round(z + football.size + baseSize() / 2);
+    }
+    else
+    {
+        posZ = round(z - football.size + baseSize() / 2);
+    }
+    if (posX < baseSize() && posZ < baseSize() && Wall[posZ][posX]) // Check if a maze exists at ball's location
     {
         return true;
     }
@@ -403,8 +432,20 @@ void autoTilt(){
     }
 }
 
+bool outOfBounds()
+{
+    Point3D expectedPoint = football.nextPosition(xIncr, yIncr, zIncr); // Check where ball will be next due to current board's tilt
+    float posX = expectedPoint.x + baseSize() / 2;
+    float posZ = expectedPoint.z + baseSize() / 2;
+    if ((posX > baseSize() || posX < 0) || (posZ > baseSize() || posZ < 0))
+    {
+        return true;
+    }
+}
+
 // Animate Callback FunctionO
-void animate(int v) {
+void animate(int v)
+{
     if (timerStarted && !completionStatus)
     {
         std::chrono::steady_clock::time_point endTime = std::chrono::steady_clock::now();
@@ -417,7 +458,8 @@ void animate(int v) {
     else
     {
         completionStatus = true;
-        if(highScoreBeat()){
+        if (highScoreBeat())
+        {
             fileManager.saveHighScore(selectedLevel, timeElapsed);
         }
     }
@@ -460,7 +502,8 @@ void boardReset()
 }
 
 // Keyboard Callback Function
-void keyboard(unsigned char key, int x, int y) {
+void keyboard(unsigned char key, int x, int y)
+{
     switch (key)
     {
     case '1':
@@ -614,7 +657,8 @@ void keyboard(unsigned char key, int x, int y) {
 };
 
 // Special Keyboard Callback Function
-void specialKeyboard(int key, int x, int y) {
+void specialKeyboard(int key, int x, int y)
+{
     switch (key)
     {
     case GLUT_KEY_UP:
@@ -635,7 +679,8 @@ void specialKeyboard(int key, int x, int y) {
 };
 
 //set texture parameters
-void setTexture(int i, const char *name, int width, int height) {
+void setTexture(int i, const char *name, int width, int height)
+{
     GLubyte *img_data = LoadPPM(name, &width, &height);
     glBindTexture(GL_TEXTURE_2D, textures[i]);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
@@ -649,10 +694,8 @@ void setTexture(int i, const char *name, int width, int height) {
 // Glut Initialization Function
 void init()
 {
-    // Load ball only once
-    loadBall();
-
-    glClearColor(0.5, 0.5, 0.5, 0);
+    loadBall(); // Load ball only once
+    glClearColor(0.05, 0.05, 0.05, 0);
     glColor3f(1, 1, 1);
 
     // Enable Lighting
@@ -678,7 +721,8 @@ void init()
 };
 
 // Print Program Instructions
-void printInstructions() {
+void printInstructions()
+{
     using namespace std;
     cout << "Program Instructions:" << endl;
     cout << "Use q to close the program at any time." << endl;
