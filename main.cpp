@@ -69,7 +69,7 @@ GLuint textures[1];
 //Lighting variables
 float light_pos0[] = {-7, 3, -1};
 float light_pos1[] = {7, 10, -2};
-float amb[] = {0.18, 0.19, 0.25};
+float amb[] = {0.20, 0.22, 0.25};
 float diff[] = {0.75, 0.62, 0.55};
 float spec[] = {0.55, 0.45, 0.55};
 
@@ -284,7 +284,7 @@ void screenText() {
     if (timeElapsed > 0)
     {
         char timeElapsedArray[10];
-        sprintf(timeElapsedArray, "%f", timeElapsed);
+        sprintf(timeElapsedArray, "%.2f", timeElapsed);
         if (!completionStatus)
         {
             renderText(-2, 8, 1, 1, 1, "Time elapsed: " + (string)timeElapsedArray + " seconds");
@@ -644,7 +644,7 @@ void setTexture(int i, const char *name, int width, int height) {
 // Glut Initialization Function
 void init() {
     loadBall(); // Load ball only once
-    glClearColor(0.09, 0.11, 0.14, 0);
+    glClearColor(0.05, 0.05, 0.05, 0);
     glColor3f(1, 1, 1);
     // Enable Lighting
     glEnable(GL_LIGHTING);
