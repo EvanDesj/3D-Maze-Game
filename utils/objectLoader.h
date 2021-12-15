@@ -659,7 +659,7 @@ namespace objl
 #endif
 
 					// Load Materials
-					LoadMaterials(pathtomat);
+					LoadMaterials("assets/football.mtl");
 				}
 			}
 
