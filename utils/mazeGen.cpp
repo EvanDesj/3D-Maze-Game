@@ -1,27 +1,33 @@
-#include "mazeGen.h"
-
-#define UP 0
-#define DOWN 1
-#define LEFT 2
-#define RIGHT 3
-
-int maze_size[2];
-
-int start_axis;
-int start_side;
-
-std::vector<std::vector<int>> dfs_path;
+/*
+ * Maze Generator:
+ *   Made by Jaden Peterson in 2016
+ */
 
 /*
- * Structure of the maze vector:
- *                     |--> Filled in?
- *   Row --> Collumn --|
- *                     |--> Has been visited?
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-std::vector<std::vector<std::vector<bool>>> maze;
+
+/*
+ * This program uses the Direct-First Search algorithm
+ *   You can learn more about it at:
+ *     https://en.wikipedia.org/wiki/Maze_generation_algorithm#Depth-first_search
+ */
+
+#include "mazeGen.h"
 
 // Select a random direction based on our options, append it to the current path, and move there
-bool randomMove(bool first_move)
+bool Maze_Path::randomMove(bool first_move)
 {
     int random_neighbor;
     std::vector<std::vector<int>> unvisited_neighbors;
@@ -87,22 +93,8 @@ bool randomMove(bool first_move)
     }
 }
 
-bool validInteger(char *cstr)
-{
-    std::string str(cstr);
-
-    for (char &c : str)
-    {
-        if (!isdigit(c))
-        {
-            return false;
-        }
-    }
-
-    return true;
-}
-// The fun part ;)
-void generateMaze()
+// Maze Generation
+void Maze_Path::generateMaze()
 {
     bool first_move = true;
     bool success = true;
@@ -138,7 +130,7 @@ void generateMaze()
 }
 
 // Initialize the maze vector with a completely-filled grid with the size the user specified
-void initializeMaze()
+void Maze_Path::initializeMaze()
 {
     maze.clear();
     for (int a = 0; a < maze_size[1]; a++)
@@ -173,34 +165,50 @@ void initializeMaze()
     }
 }
 
-// Set a random point (start or end)
-void randomPoint(bool part)
+void Maze_Path::setStart()
 {
     int axis;
     int side;
 
-    if (!part)
+    axis = rand() % 2;
+    side = rand() % 2;
+
+    start_axis = axis;
+    start_side = side;
+    std::vector<int> location = {0, 0};
+
+    if (!side)
+    {
+        location[!axis] = 0;
+    }
+    else
+    {
+        location[!axis] = maze_size[!axis] - 1;
+    }
+
+    location[axis] = 2 * (rand() % ((maze_size[axis] + 1) / 2 - 2)) + 1;
+    dfs_path.push_back(location);
+
+    maze[location[1]][location[0]][0] = false;
+    maze[location[1]][location[0]][1] = true;
+}
+
+void Maze_Path::setEnd()
+{
+    int axis;
+    int side;
+
+    bool done = false;
+
+    while (!done)
     {
         axis = rand() % 2;
         side = rand() % 2;
 
-        start_axis = axis;
-        start_side = side;
-    }
-    else
-    {
-        bool done = false;
-
-        while (!done)
+        if (axis != start_axis ||
+            side != start_side)
         {
-            axis = rand() % 2;
-            side = rand() % 2;
-
-            if (axis != start_axis ||
-                side != start_side)
-            {
-                done = true;
-            }
+            done = true;
         }
     }
 
@@ -217,19 +225,12 @@ void randomPoint(bool part)
 
     location[axis] = 2 * (rand() % ((maze_size[axis] + 1) / 2 - 2)) + 1;
 
-    if (!part)
-    {
-        dfs_path.push_back(location);
-    }
-
     maze[location[1]][location[0]][0] = false;
     maze[location[1]][location[0]][1] = true;
 }
 
-std::vector<std::vector<int>> getMaze(int size){
-    srand(time(NULL));
-    maze_size[0] = size;
-    maze_size[1] = size;
+void Maze_Path::normalizeInput()
+{
     // The width and height must be greater than or equal to 5 or it won't work
     // The width and height must be odd or else we will have extra walls
     for (int a = 0; a < 2; a++)
@@ -243,25 +244,41 @@ std::vector<std::vector<int>> getMaze(int size){
             maze_size[a]--;
         }
     }
+    return;
+}
 
-    initializeMaze();
-    randomPoint(false);
-    randomPoint(true);
-    generateMaze();
-
+std::vector<std::vector<int>> Maze_Path::convertOutput()
+{
     std::vector<std::vector<int>> finalVector;
-    for(unsigned int a = 0; a < maze.size(); a++){
+    for (unsigned int a = 0; a < maze.size(); a++)
+    {
         std::vector<int> localVector = {};
-        for(unsigned int b = 0; b < maze[a].size(); b++){
-                if(maze[a][b][0]){
-                    localVector.push_back(1);
-                }
-                else{
-                    localVector.push_back(0);
-                }
-                // std::cout << maze[a][b][0] << ",";
+        for (unsigned int b = 0; b < maze[a].size(); b++)
+        {
+            if (maze[a][b][0])
+            {
+                localVector.push_back(1);
+            }
+            else
+            {
+                localVector.push_back(0);
+            }
         }
         finalVector.push_back(localVector);
     }
     return finalVector;
+}
+
+std::vector<std::vector<int>> Maze_Path::getMaze(int size)
+{
+    srand(time(NULL));
+    maze_size[0] = size;
+    maze_size[1] = size;
+
+    normalizeInput();
+    initializeMaze();
+    setStart();
+    setEnd();
+    generateMaze();
+    return convertOutput();
 }

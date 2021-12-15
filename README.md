@@ -131,9 +131,10 @@ Since we are only computing the expected position of the ball and then checking 
 - Other features
   
 ## Citations
- - **.OBJ Loader** : https://github.com/Bly7/OBJ-Loader 
+- **.OBJ Loader** : https://github.com/Bly7/OBJ-Loader 
 	- Used as is without modifications
 - **Ball Model** : https://free3d.com/3d-model/football-ball--64059.html 
 	- Used with modification to .obj file
 	- .mtl file added manually 
 - **Lecture Slides** : https://avenue.cllmcmaster.ca/d2l/le/content/414625/viewContent/3401120/View
+- **Maze Generation Algorithm** : https://codereview.stackexchange.com/q/135443
