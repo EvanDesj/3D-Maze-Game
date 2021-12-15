@@ -460,6 +460,26 @@ bool outOfBounds()
     return false;
 }
 
+void autoTilt(){
+    if (xIncr > 0){
+        xIncr = xIncr - 0.1; 
+    }
+    if (xIncr < 0){
+        xIncr = xIncr + 0.1;
+    }
+    if (zIncr > 0){
+        zIncr = zIncr - 0.1; 
+    }
+    if (zIncr < 0){
+        zIncr = zIncr + 0.1;
+    }
+    if (xIncr >= -0.1 && xIncr <= 0.1){
+        xIncr = 0;
+    }
+    if (zIncr >= -0.1 && zIncr <= 0.1){
+        zIncr = 0;
+    }
+}
 // Animate Callback FunctionO
 void animate(int v)
 {
@@ -480,6 +500,7 @@ void animate(int v)
             fileManager.saveHighScore(selectedLevel, timeElapsed);
         }
     }
+    autoTilt();
     glutPostRedisplay();
     glutTimerFunc(timerFunc, animate, 0);
 };
