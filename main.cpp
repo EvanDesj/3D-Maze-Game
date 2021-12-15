@@ -25,6 +25,7 @@ Final Project:
 #include <cmath>
 #include <list>
 #include <vector>
+#include "HUD.h"
 #include "camera.h"
 #include "board.h"
 #include "utils/PPM.h"
