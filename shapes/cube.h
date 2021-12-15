@@ -23,7 +23,7 @@ public:
     Cube(Vec3D center, Vec3D size, Vec3D rotationAngle, Colour colour, Material material, int texture);
 
     void draw();
-    void drawBox(GLfloat size);
+    void drawBox(GLuint textures[], GLfloat size);
 };
 
 #endif

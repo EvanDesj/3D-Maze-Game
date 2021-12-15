@@ -75,12 +75,12 @@ float diff2[] = {0.37, 0.37, 0.20};
 float spec2[] = {0.26, 0.17, 0.20};
 
 // //Material variables
-Material wallMat = Material('w');
-Material ballMat = Material('w');
-Material floorMat = Material(Colour(0.12f, 0.18f, 0.25f, 1.0f),
-                             Colour(0.67f, 0.65f, 0.5f, 1.0f),
-                             Colour(0.70f, 0.70f, 0.55f, 1.0f),
-                             0.0f);
+// Material wallMat = Material('w');
+// Material ballMat = Material('w');
+// Material floorMat = Material(Colour(0.12f, 0.18f, 0.25f, 1.0f),
+//                              Colour(0.67f, 0.65f, 0.5f, 1.0f),
+//                              Colour(0.70f, 0.70f, 0.55f, 1.0f),
+//                              0.0f);
 
 // Begin walls at level1
 vector<vector<int>> Wall = level1;
@@ -141,43 +141,6 @@ void renderBall()
     glScalef(football.size, football.size, football.size);
     drawFromObj(BallObject);
 }
-
-
-// // Function to render walls/maze
-// void renderWalls() {
-//     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, wallMat.ambient.getColour());
-//     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, wallMat.diffuse.getColour());
-//     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, wallMat.specular.getColour());
-//     glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 10);
-//     glBindTexture(GL_TEXTURE_2D, textures[0]);
-//     for (int i = 0; i < walls.size(); i++)
-//     {
-//         for (int j = 0; j < baseSize(); j++)
-//         {
-//             if (Wall[i][j] == 1)
-//             {
-//                 glPushMatrix();
-//                 glTranslatef(i, 1, j);      // Draw wall at position (i,j) at fixed y position
-//                 drawBox(1);            // Draw cube of size 1
-//                 glPopMatrix();
-//             }
-//         }
-//     }
-// }
-
-// void renderFloor()
-// {
-//     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, floorMat.ambient.getColour());
-//     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, floorMat.diffuse.getColour());
-//     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, floorMat.specular.getColour());
-//     glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 10);
-//     glBindTexture(GL_TEXTURE_2D, textures[1]);
-//     glEnable(GL_TEXTURE_GEN_S); //enable texture coordinate generation
-//     glEnable(GL_TEXTURE_GEN_T);
-//     gameBoard.draw();
-//     glDisable(GL_TEXTURE_GEN_S); //enable texture coordinate generation
-//     glDisable(GL_TEXTURE_GEN_T);
-// }
 
 void startTimer()
 {
@@ -379,8 +342,6 @@ void display() {
     gluLookAt(camera.getX(), camera.getY(), camera.getZ(), 0, 0, 0, camera.rotX, camera.rotY, camera.rotZ);
 
     screenText();
-    glEnable(GL_LIGHTING);
-    glColor3f(1, 1, 1);
 
     // Matrix so ball and walls also move as board rotates
     glPushMatrix();
@@ -393,13 +354,6 @@ void display() {
     glRotatef(0 + yIncr, 0, 1, 0);
     glRotatef(0 + zIncr, 0, 0, 1);
 
-    // glEnable(GL_TEXTURE_GEN_S); //enable texture coordinate generation
-    // glEnable(GL_TEXTURE_GEN_T);
-    // glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, floorMat.ambient.getColour());
-    // glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, floorMat.diffuse.getColour());
-    // glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, floorMat.specular.getColour());
-    // glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 10);
-    // glBindTexture(GL_TEXTURE_2D, textures[0]);
     gameBoard.draw(textures);
 
     //Add Ball
@@ -429,21 +383,21 @@ bool outOfBounds()
 
 void autoTilt(){
     if (xIncr > 0){
-        xIncr = xIncr - 0.1; 
+        xIncr = xIncr - 0.01; 
     }
     if (xIncr < 0){
-        xIncr = xIncr + 0.1;
+        xIncr = xIncr + 0.01;
     }
     if (zIncr > 0){
-        zIncr = zIncr - 0.1; 
+        zIncr = zIncr - 0.01; 
     }
     if (zIncr < 0){
-        zIncr = zIncr + 0.1;
+        zIncr = zIncr + 0.01;
     }
-    if (xIncr >= -0.1 && xIncr <= 0.1){
+    if (xIncr >= -0.01 && xIncr <= 0.01){
         xIncr = 0;
     }
-    if (zIncr >= -0.1 && zIncr <= 0.1){
+    if (zIncr >= -0.01 && zIncr <= 0.01){
         zIncr = 0;
     }
 }

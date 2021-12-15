@@ -39,13 +39,18 @@ void Cube::draw()
     glRotatef(this->rotationAngle.z, 0.0f, 0.0f, 1.0f);
 
     // Draw the cube
-    glNormal3f(0, 1, 0);
     glutSolidCube(1);
     glPopMatrix();
 }
 
-void Cube::drawBox(GLfloat size)
+void Cube::drawBox(GLuint textures[], GLfloat size)
 {
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, this->material.ambient.getColour());
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, this->material.diffuse.getColour());
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, this->material.specular.getColour());
+    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 10);
+    glBindTexture(GL_TEXTURE_2D, textures[this->texture]);
+    glTranslatef(this->center.x, this->center.y, this->center.z);
     static GLfloat n[6][3] =
     {
         {-1.0, 0.0, 0.0},

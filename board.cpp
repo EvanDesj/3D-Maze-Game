@@ -42,12 +42,11 @@ Board::Board(Vec3D center, int size, vector<vector<int>> wallInput)
             floorRow.push_back(Cube(Vec3D(this->center.x + i, this->center.y, this->center.z + k),
                                     Vec3D(1.0f, 1.0f, 1.0f),
                                     Vec3D(0.0f, 0.0f, 0.0f),
-                                    Colour(0.36f, 0.27f, 0.54f, 1.0f),
-                                    Material(
-                                        Colour(0.36f, 0.27f, 0.54f, 1.0f),
-                                        Colour(0.30f, 0.20f, 0.50f, 1.0f),
-                                        Colour(0.45f, 0.35f, 0.70f, 1.0f),
-                                        0.3f),
+                                    Colour(1.0f, 1.0f, 1.0f, 1.0f),
+                                    Material(Colour(0.12f, 0.18f, 0.25f, 1.0f),
+                                             Colour(0.67f, 0.65f, 0.5f, 1.0f),
+                                             Colour(0.70f, 0.70f, 0.55f, 1.0f),
+                                             0.0f),
                                     0));
 
             //check if 1 at position in walls vector, push a cube at that positition if true
@@ -56,12 +55,12 @@ Board::Board(Vec3D center, int size, vector<vector<int>> wallInput)
                 wallsRow.push_back(Cube(Vec3D(this->center.x + i, this->center.y + 1, this->center.z + k),
                                         Vec3D(1.0f, 1.0f, 1.0f),
                                         Vec3D(0.0f, 0.0f, 0.0f),
-                                        Colour(1, 0, 1, 1.0f),
+                                        Colour(0.0f, 0.0f, 0.0f, 1.0f),
                                         Material(
-                                            Colour(0.36f, 0.27f, 0.54f, 1.0f),
-                                            Colour(0.30f, 0.20f, 0.50f, 1.0f),
-                                            Colour(0.45f, 0.35f, 0.70f, 1.0f),
-                                            0.3f),
+                                            Colour(1, 0.95, 0.80, 1.0),
+                                            Colour(1, 1, 1, 1.0),
+                                            Colour(1, 1, 1, 1.0),
+                                            0.0f),
                                         1));
             
             }
@@ -70,12 +69,12 @@ Board::Board(Vec3D center, int size, vector<vector<int>> wallInput)
                 wallsRow.push_back(Cube(Vec3D(this->center.x + i, this->center.y + 1, this->center.z + k),
                                         Vec3D(0.0f, 0.0f, 0.0f),
                                         Vec3D(0.0f, 0.0f, 0.0f),
-                                        Colour(1, 0, 1, 1.0f),
+                                        Colour(0.0f, 0.0f, 0.0f, 1.0f),
                                         Material(
-                                            Colour(0.36f, 0.27f, 0.54f, 1.0f),
-                                            Colour(0.30f, 0.20f, 0.50f, 1.0f),
-                                            Colour(0.45f, 0.35f, 0.70f, 1.0f),
-                                            0.3f),
+                                            Colour(1, 0.95, 0.80, 1.0),
+                                            Colour(1, 1, 1, 1.0),
+                                            Colour(1, 1, 1, 1.0),
+                                            0.0f),
                                         1));
             }
         }
@@ -115,9 +114,9 @@ Board::Board(Vec3D center, int size, vector<vector<int>> wallInput, vector<vecto
             if (floorInput.at(i + (-1 * lowerIndexLimit)).at(k + (-1 * lowerIndexLimit)) == 1)
             {
                 floorRow.push_back(Cube(Vec3D(this->center.x + i, this->center.y, this->center.z + k),
+                                        Vec3D(1.0f, 1.0f, 1.0f),
                                         Vec3D(0.0f, 0.0f, 0.0f),
-                                        Vec3D(0.0f, 0.0f, 0.0f),
-                                        Colour(0.36f, 0.27f, 0.54f, 1.0f),
+                                        Colour(1.0f, 1.0f, 1.0f, 1.0f),
                                         Material(
                                             Colour(0.12f, 0.18f, 0.25f, 1.0f),
                                             Colour(0.67f, 0.65f, 0.5f, 1.0f),
@@ -130,7 +129,7 @@ Board::Board(Vec3D center, int size, vector<vector<int>> wallInput, vector<vecto
                 floorRow.push_back(Cube(Vec3D(this->center.x + i, this->center.y, this->center.z + k),
                                         Vec3D(0.0f, 0.0f, 0.0f),
                                         Vec3D(0.0f, 0.0f, 0.0f),
-                                        Colour(0.36f, 0.27f, 0.54f, 1.0f),
+                                        Colour(1.0f, 1.0f, 1.0f, 1.0f),
                                         Material(
                                             Colour(0.12f, 0.18f, 0.25f, 1.0f),
                                             Colour(0.67f, 0.65f, 0.5f, 1.0f),
@@ -145,7 +144,7 @@ Board::Board(Vec3D center, int size, vector<vector<int>> wallInput, vector<vecto
                 wallsRow.push_back(Cube(Vec3D(this->center.x + i, this->center.y + 1, this->center.z + k),
                                         Vec3D(1.0f, 1.0f, 1.0f),
                                         Vec3D(0.0f, 0.0f, 0.0f),
-                                        Colour(1, 0, 1, 1.0f),
+                                        Colour(0.0f, 0.0f, 0.0f, 1.0f),
                                         Material(
                                             Colour(1, 0.95, 0.80, 1.0),
                                             Colour(1, 1, 1, 1.0),
@@ -159,7 +158,7 @@ Board::Board(Vec3D center, int size, vector<vector<int>> wallInput, vector<vecto
                 wallsRow.push_back(Cube(Vec3D(this->center.x + i, this->center.y + 1, this->center.z + k),
                                         Vec3D(0.0f, 0.0f, 0.0f),
                                         Vec3D(0.0f, 0.0f, 0.0f),
-                                        Colour(1, 0, 1, 1.0f),
+                                        Colour(0.0f, 0.0f, 0.0f, 1.0f),
                                         Material(
                                             Colour(1, 0.95, 0.80, 1.0),
                                             Colour(1, 1, 1, 1.0),
@@ -178,10 +177,6 @@ Board::Board(Vec3D center, int size, vector<vector<int>> wallInput, vector<vecto
 
 
 void Board::draw(GLuint textures[]) {
-    // cout << "enter draw" << endl;
-    // cout << "board size: " << this->board.size() << endl;
-    // cout << "inner board size: " << this->board.at(0).size() << endl;
-    // cout << "this->size: " << this->size << endl;
     for (int i = 0; i < this->board.size(); i++)
     {    
         for (int j = 0; j < this->size; j++)
@@ -191,14 +186,14 @@ void Board::draw(GLuint textures[]) {
                 Cube currentCube = this->board.at(i).at(j).at(k);
                 if (currentCube.size.x != 0)
                 {   
-                    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, currentCube.material.ambient.getColour());
-                    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, currentCube.material.diffuse.getColour());
-                    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, currentCube.material.specular.getColour());
-                    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 10);
-                    glBindTexture(GL_TEXTURE_2D, textures[currentCube.texture]);
+                    // glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, currentCube.material.ambient.getColour());
+                    // glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, currentCube.material.diffuse.getColour());
+                    // glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, currentCube.material.specular.getColour());
+                    // glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 10);
+                    // glBindTexture(GL_TEXTURE_2D, textures[currentCube.texture]);
                     glPushMatrix();
-                    glTranslatef(currentCube.center.x, currentCube.center.y, currentCube.center.z);
-                    this->board.at(i).at(j).at(k).drawBox(1);
+                    // glTranslatef(currentCube.center.x, currentCube.center.y, currentCube.center.z);
+                    this->board.at(i).at(j).at(k).drawBox(textures, 1);
                     glPopMatrix();
                 }
             }
