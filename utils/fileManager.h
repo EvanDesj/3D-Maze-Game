@@ -11,7 +11,6 @@ using namespace std;
 class FileManager
 {
 private:
-    void prettyPrintLevel();
     bool highScoreSaved = false;
 public:
     FileManager();
@@ -22,4 +21,5 @@ public:
     void reset();
 };
 
+void prettyPrintLevel(vector<vector<int>>);
 #endif

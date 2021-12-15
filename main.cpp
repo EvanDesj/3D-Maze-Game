@@ -28,6 +28,7 @@ Final Project:
 #include "shapes/ball.h"
 #include "utils/levelManager.h"
 #include "utils/fileManager.h"
+#include "utils/mazeGen.h"
 #include <string.h>
 #include <chrono>
 using namespace std;
@@ -82,10 +83,14 @@ Material floorMat = Material(Colour(0.12f, 0.18f, 0.25f, 1.0f),
                              0.0f);
 
 // Begin walls at level1
-vector<vector<int>> walls = level1;
+vector<vector<int>> Wall = level1;
+
+int baseSize() {
+    return Wall.size();
+}
 
 // Initialize game board
-Board gameBoard = Board(Vec3D(0, 0, 0), walls.size(), walls);
+Board gameBoard = Board(Vec3D(0, 0, 0), baseSize(), Wall);
 
 // Function to load ball
 void loadBall() {
@@ -222,12 +227,94 @@ bool highScoreBeat()
     return false;
 }
 
+string boolToText(bool val)
+{
+    if (val)
+    {
+        return "T";
+    }
+    return "F";
+}
+
+bool withinBoardLimits(int val)
+{
+    if (val < baseSize() && val >= 0)
+    {
+        return true;
+    }
+    return false;
+}
+
+bool allowedUp()
+{
+    int posX = ceil(football.position.x + baseSize() / 2);
+    int posZL = ceil(football.position.z + baseSize() / 2);
+    int posZR = floor(football.position.z + baseSize() / 2);
+    if (withinBoardLimits(posZL) && withinBoardLimits(posZR) && withinBoardLimits(posX - 1) && Wall[posZL][posX - 1] && Wall[posZR][posX - 1])
+    {
+        return false;
+    }
+    return true;
+}
+
+bool allowedDown()
+{
+    int posX = floor(football.position.x + baseSize() / 2);
+    int posZL = ceil(football.position.z + baseSize() / 2);
+    int posZR = floor(football.position.z + baseSize() / 2);
+    if (withinBoardLimits(posZL) && withinBoardLimits(posZR) && withinBoardLimits(posX + 1) && Wall[posZL][posX + 1] && Wall[posZR][posX + 1])
+    {
+        return false;
+    }
+    return true;
+}
+
+bool allowedLeft()
+{
+    int posXU = ceil(football.position.x + baseSize() / 2);
+    int posXD = floor(football.position.x + baseSize() / 2);
+    int posZ = ceil(football.position.z + baseSize() / 2);
+    if (withinBoardLimits(posXU) && withinBoardLimits(posXD) && withinBoardLimits(posZ - 1) && Wall[posZ - 1][posXU] && Wall[posZ - 1][posXD])
+    {
+        return false;
+    }
+    return true;
+}
+
+bool allowedRight()
+{
+    int posXU = ceil(football.position.x + baseSize() / 2);
+    int posXD = floor(football.position.x + baseSize() / 2);
+    int posZ = floor(football.position.z + baseSize() / 2);
+    if (withinBoardLimits(posXU) && withinBoardLimits(posXD) && withinBoardLimits(posZ + 1) && Wall[posZ + 1][posXU] && Wall[posZ + 1][posXD])
+    {
+        return false;
+    }
+    return true;
+}
+
+// Function to update ball's position
+void updateBallPosition()
+{
+    if ((xIncr < 0 && allowedUp()) || (xIncr > 0 && allowedDown()))
+    {
+        football.update(football.nextPosition(xIncr, 0, 0)); // Move ball up or down
+    }
+    if ((zIncr < 0 && allowedRight()) || (zIncr > 0 && allowedLeft()))
+    {
+        football.update(football.nextPosition(0, 0, zIncr)); // Move ball left or right
+    }
+}
+
 void screenText()
 {
-    glPushMatrix();
-    renderText(-1, 12, 1, 0.5, 0.25, "Welcome");
-    renderText(-4, 11, 1, 1, 0.25, "Use W,A,S,D to control board");
-    renderText(-5, 10, 0.5, 1, 1, "Use arrow keys to control camera");
+    glBindTexture(GL_TEXTURE_2D, 0);
+    float baseHeight = (float)windowHeight / 4;
+    float widthOffset = 10;
+    // renderText(widthOffset, baseHeight - 100, "left: " + boolToText(allowedLeft()) + " , right: " + boolToText(allowedRight()) + " , up: " + boolToText(allowedUp()) + " , down: " + boolToText(allowedDown()));
+    renderText(widthOffset, baseHeight, 1, 1, 1, "Welcome");
+    renderText(widthOffset, baseHeight - 20, 1, 1, 1, "Use W,A,S,D to control board");
+    renderText(widthOffset, baseHeight - 40, 1, 1, 1, "Use arrow keys to control camera");
     if (highScores[selectedLevel] != 0)
     {
         float targetScore = highScores[selectedLevel];
@@ -328,64 +415,37 @@ void display() {
     glutSwapBuffers();
 };
 
-// Function to detect collision
-bool collisionDetected(float x, float z) {
-    int posX, posZ = 0;
-    if (xIncr < 0)
-    {
-        posX = round(x - football.size + walls.size() / 2);
-    }
-    else
-    {
-        posX = round(x + football.size + walls.size() / 2);
-    }
-    if (zIncr < 0)
-    {
-        posZ = round(z + football.size + walls.size() / 2);
-    }
-    else
-    {
-        posZ = round(z - football.size + walls.size() / 2);
-    }
-    if (posX < walls.size() && posZ < walls.size() && walls[posZ][posX]) // Check if a maze exists at ball's location
+bool outOfBounds()
+{
+    // Point3D expectedPoint = football.nextPosition(xIncr, yIncr, zIncr, Wall); // Check where ball will be next due to current board's tilt
+    float posX = football.position.x + baseSize() / 2;
+    float posZ = football.position.z + baseSize() / 2;
+    if ((posX > baseSize() || posX < 0) || (posZ > baseSize() || posZ < 0))
     {
         return true;
     }
     return false;
 }
 
-// Function to update ball's position
-void updateBallPosition() {
-    Point3D expectedPoint = football.nextPosition(xIncr, yIncr, zIncr); // Check where ball will be next due to current board's tilt
-    if (!collisionDetected(expectedPoint.x, expectedPoint.z))
-    {
-        football.update(expectedPoint); // If no collision is detected, move ball to expected position
-        return;
+void autoTilt(){
+    if (xIncr > 0){
+        xIncr = xIncr - 0.1; 
     }
-    // If collision is only detected on one axis, move ball along other axis if tilt is present.
-    expectedPoint = football.nextPosition(xIncr, 0, 0);
-    if (!collisionDetected(expectedPoint.x, expectedPoint.z))
-    {
-        football.update(expectedPoint);
-        return;
+    if (xIncr < 0){
+        xIncr = xIncr + 0.1;
     }
-    expectedPoint = football.nextPosition(0, 0, zIncr);
-    if (!collisionDetected(expectedPoint.x, expectedPoint.z))
-    {
-        football.update(expectedPoint);
-        return;
+    if (zIncr > 0){
+        zIncr = zIncr - 0.1; 
     }
-}
-
-bool outOfBounds() {
-    Point3D expectedPoint = football.nextPosition(xIncr, yIncr, zIncr); // Check where ball will be next due to current board's tilt
-    float posX = expectedPoint.x + walls.size() / 2;
-    float posZ = expectedPoint.z + walls.size() / 2;
-    if ((posX > walls.size() || posX < 0) || (posZ > walls.size() || posZ < 0))
-    {
-        return true;
+    if (zIncr < 0){
+        zIncr = zIncr + 0.1;
     }
-    return false;
+    if (xIncr >= -0.1 && xIncr <= 0.1){
+        xIncr = 0;
+    }
+    if (zIncr >= -0.1 && zIncr <= 0.1){
+        zIncr = 0;
+    }
 }
 
 // Animate Callback FunctionO
@@ -406,6 +466,7 @@ void animate(int v) {
             fileManager.saveHighScore(selectedLevel, timeElapsed);
         }
     }
+    autoTilt();
     glutPostRedisplay();
     glutTimerFunc(timerFunc, animate, 0);
 };
@@ -438,7 +499,7 @@ void boardReset()
     beginTime = std::chrono::steady_clock::now();
     timerStarted = false;
     timeElapsed = 0;
-    gameBoard = Board(Vec3D(0, 0, 0), walls.size(), walls); // Reinitialize game board
+    gameBoard = Board(Vec3D(0, 0, 0), baseSize(), Wall); // Reinitialize game board
     highScores = fileManager.getHighScores();
     fileManager.reset();
 }
@@ -448,25 +509,31 @@ void keyboard(unsigned char key, int x, int y) {
     switch (key)
     {
     case '1':
-        walls = level1;
+        Wall = level1;
         selectedLevel = "1";
         boardReset();
         break;
     case '2':
-        walls = level2;
+        Wall = level2;
         selectedLevel = "2";
         boardReset();
         break;
     case '3':
-        walls = level3;
+        Wall = level3;
         selectedLevel = "3";
+        boardReset();
+        break;
+    case '4':
+        // prettyPrintLevel(getMaze(11));
+        Wall = getMaze(11);
+        selectedLevel = "Random";
         boardReset();
         break;
     case '5':
         selectedLevel = "Custom";
         if (fileManager.loadLevel())
         {
-            walls = fileManager.loadedLevel;
+            Wall = fileManager.loadedLevel;
             boardReset();
             cout << "Board loaded from external file" << endl;
         }
