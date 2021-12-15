@@ -137,49 +137,6 @@ void renderBall()
     drawFromObj(BallObject);
 }
 
-void drawBox(GLfloat size) {
-  static GLfloat n[6][3] =
-  {
-    {-1.0, 0.0, 0.0},
-    {0.0, 1.0, 0.0},
-    {1.0, 0.0, 0.0},
-    {0.0, -1.0, 0.0},
-    {0.0, 0.0, 1.0},
-    {0.0, 0.0, -1.0}
-  };
-  static GLint faces[6][4] =
-  {
-    {0, 1, 2, 3},
-    {3, 2, 6, 7},
-    {7, 6, 5, 4},
-    {4, 5, 1, 0},
-    {5, 6, 2, 1},
-    {7, 4, 0, 3}
-  };
-  GLfloat v[8][3];
-  GLint i;
-
-  v[0][0] = v[1][0] = v[2][0] = v[3][0] = -size / 2;
-  v[4][0] = v[5][0] = v[6][0] = v[7][0] = size / 2;
-  v[0][1] = v[1][1] = v[4][1] = v[5][1] = -size / 2;
-  v[2][1] = v[3][1] = v[6][1] = v[7][1] = size / 2;
-  v[0][2] = v[3][2] = v[4][2] = v[7][2] = -size / 2;
-  v[1][2] = v[2][2] = v[5][2] = v[6][2] = size / 2;
-
-  for (i = 5; i >= 0; i--) {
-    glBegin(GL_POLYGON);
-    glNormal3fv(&n[i][0]);
-    glTexCoord2f(1,1);
-    glVertex3fv(&v [ faces[i][0] ] [0]);
-    glTexCoord2f(1,0);
-    glVertex3fv(&v[faces[i][1]][0]);
-    glTexCoord2f(0,0);
-    glVertex3fv(&v[faces[i][2]][0]);
-    glTexCoord2f(0,1);
-    glVertex3fv(&v[faces[i][3]][0]);
-    glEnd();
-  }
-}
 
 // // Function to render walls/maze
 // void renderWalls() {
@@ -349,26 +306,14 @@ void display() {
     glRotatef(0 + yIncr, 0, 1, 0);
     glRotatef(0 + zIncr, 0, 0, 1);
 
-    glEnable(GL_TEXTURE_GEN_S); //enable texture coordinate generation
-    glEnable(GL_TEXTURE_GEN_T);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, floorMat.ambient.getColour());
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, floorMat.diffuse.getColour());
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, floorMat.specular.getColour());
-    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 10);
-    glBindTexture(GL_TEXTURE_2D, textures[0]);
-    gameBoard.draw(0);
-
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, wallMat.ambient.getColour());
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, wallMat.diffuse.getColour());
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, wallMat.specular.getColour());
-    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 10);
-    glBindTexture(GL_TEXTURE_2D, textures[1]);
-    gameBoard.draw(1);
-    
-    glDisable(GL_TEXTURE_GEN_S); //enable texture coordinate generation
-    glDisable(GL_TEXTURE_GEN_T);
-
-    
+    // glEnable(GL_TEXTURE_GEN_S); //enable texture coordinate generation
+    // glEnable(GL_TEXTURE_GEN_T);
+    // glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, floorMat.ambient.getColour());
+    // glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, floorMat.diffuse.getColour());
+    // glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, floorMat.specular.getColour());
+    // glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 10);
+    // glBindTexture(GL_TEXTURE_2D, textures[0]);
+    gameBoard.draw(textures);
 
     //Add Ball
     glPushMatrix();

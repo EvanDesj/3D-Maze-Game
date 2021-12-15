@@ -15,7 +15,7 @@ public:
 
     Board(Vec3D center, int size, vector<vector<int>> boardWalls);
     Board(Vec3D center, int size, vector<vector<int>> boardWalls, vector<vector<int>> boardFloor);
-    void draw(int level);
+    void draw(GLuint textures[]);
     void drawBox();
 };
 

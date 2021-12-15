@@ -177,18 +177,30 @@ Board::Board(Vec3D center, int size, vector<vector<int>> wallInput, vector<vecto
 }
 
 
-void Board::draw(int level) {
+void Board::draw(GLuint textures[]) {
     // cout << "enter draw" << endl;
     // cout << "board size: " << this->board.size() << endl;
     // cout << "inner board size: " << this->board.at(0).size() << endl;
     // cout << "this->size: " << this->size << endl;
-    for (int j = 0; j < this->size; j++)
-    {
-        for (int k = 0; k < this->size; k++)
+    for (int i = 0; i < this->board.size(); i++)
+    {    
+        for (int j = 0; j < this->size; j++)
         {
-            if (this->board.at(level).at(j).at(k).size.x != 0)
+            for (int k = 0; k < this->size; k++)
             {
-                this->board.at(level).at(j).at(k).draw();
+                Cube currentCube = this->board.at(i).at(j).at(k);
+                if (currentCube.size.x != 0)
+                {   
+                    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, currentCube.material.ambient.getColour());
+                    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, currentCube.material.diffuse.getColour());
+                    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, currentCube.material.specular.getColour());
+                    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 10);
+                    glBindTexture(GL_TEXTURE_2D, textures[currentCube.texture]);
+                    glPushMatrix();
+                    glTranslatef(currentCube.center.x, currentCube.center.y, currentCube.center.z);
+                    this->board.at(i).at(j).at(k).drawBox(1);
+                    glPopMatrix();
+                }
             }
         }
     }
