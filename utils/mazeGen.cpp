@@ -138,7 +138,6 @@ void Maze_Path::initializeMaze()
         for (int b = 0; b < maze_size[0]; b++)
         {
             bool is_border;
-
             if (a == 0 || a == maze_size[1] - 1 ||
                 b == 0 || b == maze_size[0] - 1)
             {
@@ -150,6 +149,11 @@ void Maze_Path::initializeMaze()
             }
 
             std::vector<bool> new_cell = {true, is_border};
+
+            if ((a == maze_size[0] / 2 && b == maze_size[1] / 2))
+            {
+                new_cell = {false, false};
+            }
 
             if ((unsigned int)a + 1 > maze.size())
             {
