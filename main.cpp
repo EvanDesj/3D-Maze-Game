@@ -42,7 +42,7 @@ float xIncr = 0;
 float yIncr = 0;
 float zIncr = 0;
 // ------------------------//
-int timerFunc = 15; // Duration between animation frames, lower is better
+int timerFunc = 10; // Duration between animation frames, lower is better
 int windowWidth = 800;
 int windowHeight = 800;
 
@@ -78,7 +78,8 @@ float spec2[] = {0.26, 0.17, 0.20};
 // Begin walls at level1
 vector<vector<int>> Wall = level1;
 
-int baseSize() {
+int baseSize()
+{
     return Wall.size();
 }
 
@@ -148,6 +149,7 @@ void startTimer()
 
 void renderText(int x, int y, string stringInput)
 {
+    glColor3f(1, 1, 1);
     glRasterPos2f(x, y);
     int len, i;
     len = (int)stringInput.length();
@@ -341,7 +343,9 @@ void display()
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+    glDisable(GL_LIGHTING);
     screenText();
+    glEnable(GL_LIGHTING);
 
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
@@ -363,23 +367,30 @@ bool outOfBounds()
     return false;
 }
 
-void autoTilt(){
-    if (xIncr > 0){
-        xIncr = xIncr - 0.01; 
+void autoTilt()
+{
+    if (xIncr > 0)
+    {
+        xIncr = xIncr - 0.1;
     }
-    if (xIncr < 0){
-        xIncr = xIncr + 0.01;
+    if (xIncr < 0)
+    {
+        xIncr = xIncr + 0.1;
     }
-    if (zIncr > 0){
-        zIncr = zIncr - 0.01; 
+    if (zIncr > 0)
+    {
+        zIncr = zIncr - 0.1;
     }
-    if (zIncr < 0){
-        zIncr = zIncr + 0.01;
+    if (zIncr < 0)
+    {
+        zIncr = zIncr + 0.1;
     }
-    if (xIncr >= -0.01 && xIncr <= 0.01){
+    if (xIncr >= -0.1 && xIncr <= 0.1)
+    {
         xIncr = 0;
     }
-    if (zIncr >= -0.01 && zIncr <= 0.01){
+    if (zIncr >= -0.01 && zIncr <= 0.01)
+    {
         zIncr = 0;
     }
 }
@@ -647,13 +658,12 @@ void init()
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(45, 1, 1, 100);
-    
+
     // Enable texturing
     glEnable(GL_TEXTURE_2D);
     glGenTextures(2, textures);
     setTexture(0, "assets/floor2.ppm", floorWidth, floorHeight);
     setTexture(1, "assets/brickTexture_2.ppm", gridWidth, gridHeight);
-    
 
     glEnable(GL_DEPTH_TEST);
     glFrontFace(GL_CW);
