@@ -282,7 +282,7 @@ void screenText()
     if (highScores[selectedLevel] != 0)
     {
         float targetScore = highScores[selectedLevel];
-        renderText(widthOffset, baseHeight - 60, "Level: " + selectedLevel + " | Time to beat: " + to_string(targetScore));
+        renderText(widthOffset, baseHeight - 60, "Level: " + selectedLevel + " | Time to beat: " + to_string(targetScore).substr(0, 4));
     }
     else
     {
