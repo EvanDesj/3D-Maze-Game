@@ -84,6 +84,9 @@ Material floorMat = Material(Colour(0.12f, 0.18f, 0.25f, 1.0f),
                              Colour(0.70f, 0.70f, 0.55f, 1.0f),
                              0.0f);
 
+// HUD variables
+HUD HUDinterface; 
+
 vector<vector<int>> Wall = level1;
 int baseSize()
 {
@@ -314,6 +317,11 @@ void screenText()
 void display()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Render HUD
+    HUDinterface.setOrthographicProjection(&windowWidth, &windowHeight);
+    HUDinterface.draw(0, windowHeight-100);
+
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(camera.getX(), camera.getY(), camera.getZ(), 0, 0, 0, camera.rotX, camera.rotY, camera.rotZ);
