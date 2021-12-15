@@ -75,14 +75,6 @@ float amb2[] = {0.20, 0.18, 0.15};
 float diff2[] = {0.37, 0.37, 0.20};
 float spec2[] = {0.26, 0.17, 0.20};
 
-// //Material variables
-// Material wallMat = Material('w');
-// Material ballMat = Material('w');
-// Material floorMat = Material(Colour(0.12f, 0.18f, 0.25f, 1.0f),
-//                              Colour(0.67f, 0.65f, 0.5f, 1.0f),
-//                              Colour(0.70f, 0.70f, 0.55f, 1.0f),
-//                              0.0f);
-
 // Begin walls at level1
 vector<vector<int>> Wall = level1;
 
@@ -310,30 +302,6 @@ void screenText()
     }
 }
 
-void drawAxis()
-{
-    glPushMatrix();
-    glLineWidth(2);
-    glBegin(GL_LINES);
-
-    //x axis
-    glColor3f(1.0, 0.0, 0.0);
-    glVertex3f(0.0, 0.0, 0.0);
-    glVertex3f(10.0, 0.0, 0.0);
-
-    //y axis
-    glColor3f(0.0, 1.0, 0.0);
-    glVertex3f(0.0, 0.0, 0.0);
-    glVertex3f(0.0, 10.0, 0.0);
-
-    //z axis
-    glColor3f(0.0, 0.0, 1.0);
-    glVertex3f(0.0, 0.0, 0.0);
-    glVertex3f(0.0, 0.0, 10.0);
-    glEnd();
-    glPopMatrix();
-}
-
 // Display Callback Function
 void display()
 {
@@ -355,7 +323,6 @@ void display()
     glRotatef(0 + xIncr, 1, 0, 0);
     glRotatef(0 + yIncr, 0, 1, 0);
     glRotatef(0 + zIncr, 0, 0, 1);
-
     gameBoard.draw(textures);
 
     //Add Ball
@@ -384,27 +351,12 @@ void display()
     glutSwapBuffers();
 };
 
-// Function to detect collision
-bool collisionDetected(float x, float z)
+bool outOfBounds()
 {
-    int posX, posZ = 0;
-    if (xIncr < 0)
-    {
-        posX = round(x - football.size + baseSize() / 2);
-    }
-    else
-    {
-        posX = round(x + football.size + baseSize() / 2);
-    }
-    if (zIncr < 0)
-    {
-        posZ = round(z + football.size + baseSize() / 2);
-    }
-    else
-    {
-        posZ = round(z - football.size + baseSize() / 2);
-    }
-    if (posX < baseSize() && posZ < baseSize() && Wall[posZ][posX]) // Check if a maze exists at ball's location
+    // Point3D expectedPoint = football.nextPosition(xIncr, yIncr, zIncr, Wall); // Check where ball will be next due to current board's tilt
+    float posX = football.position.x + baseSize() / 2;
+    float posZ = football.position.z + baseSize() / 2;
+    if ((posX > baseSize() || posX < 0) || (posZ > baseSize() || posZ < 0))
     {
         return true;
     }
@@ -430,18 +382,6 @@ void autoTilt(){
     if (zIncr >= -0.01 && zIncr <= 0.01){
         zIncr = 0;
     }
-}
-
-bool outOfBounds()
-{
-    Point3D expectedPoint = football.nextPosition(xIncr, yIncr, zIncr); // Check where ball will be next due to current board's tilt
-    float posX = expectedPoint.x + baseSize() / 2;
-    float posZ = expectedPoint.z + baseSize() / 2;
-    if ((posX > baseSize() || posX < 0) || (posZ > baseSize() || posZ < 0))
-    {
-        return true;
-    }
-    return false;
 }
 
 // Animate Callback FunctionO
