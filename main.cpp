@@ -37,15 +37,16 @@ using namespace std;
 #define WINDOW_TITLE "3GC3 Final Project - Labyrinth"
 
 // Configuration Variables (Modify before build)
+int timerFunc = 10; // Duration between animation frames, lower is better
+int windowWidth = 800;
+int windowHeight = 800;
+bool debugMode = false;
+
+// Do not modify
 // Global variables for gameboard rotation increments
 float xIncr = 0;
 float yIncr = 0;
 float zIncr = 0;
-// ------------------------//
-int timerFunc = 10; // Duration between animation frames, lower is better
-int windowWidth = 800;
-int windowHeight = 800;
-
 objl::Loader BallObject;        // Ball object where ball.obj will be loaded in
 bool ballTextureLoaded = false; // Boolean to check if the ball object has been loaded or not
 bool completionStatus = false;
@@ -268,19 +269,26 @@ void updateBallPosition()
 void screenText()
 {
     glBindTexture(GL_TEXTURE_2D, 0);
-    float baseHeight = (float)windowHeight / 4;
+    float baseHeight = (float)windowHeight / 3;
     float widthOffset = 10;
+    if (debugMode)
+    {
+        renderText(widthOffset, baseHeight - 150, "Debug Mode:");
+        renderText(widthOffset, baseHeight - 175, "Allowed | Left: " + boolToText(allowedLeft()) + " , Right: " + boolToText(allowedRight()) + " , Up: " + boolToText(allowedUp()) + " , Down: " + boolToText(allowedDown()));
+        renderText(widthOffset, baseHeight - 200, "Ball Position | X: " + to_string(football.position.x) + " , Y: " + to_string(football.position.y) + " , Z: " + to_string(football.position.z));
+        renderText(widthOffset, baseHeight - 225, "Tilt | X: " + to_string(xIncr) + " , Y: " + to_string(yIncr) + " , Z: " + to_string(zIncr));
+    }
     renderText(widthOffset, baseHeight, "Welcome");
-    renderText(widthOffset, baseHeight - 20, "Use W,A,S,D to control board");
-    renderText(widthOffset, baseHeight - 40, "Use arrow keys to control camera");
+    renderText(widthOffset, baseHeight - 25, "Use W,A,S,D to control board");
+    renderText(widthOffset, baseHeight - 50, "Use arrow keys to control camera");
     if (highScores[selectedLevel] != 0)
     {
         float targetScore = highScores[selectedLevel];
-        renderText(widthOffset, baseHeight - 60, "Level: " + selectedLevel + " | Time to beat: " + to_string(targetScore).substr(0, 4));
+        renderText(widthOffset, baseHeight - 75, "Level: " + selectedLevel + " | Time to beat: " + to_string(targetScore).substr(0, 4));
     }
     else
     {
-        renderText(widthOffset, baseHeight - 60, "Level: " + selectedLevel);
+        renderText(widthOffset, baseHeight - 75, "Level: " + selectedLevel);
     }
     if (timeElapsed > 0)
     {
@@ -288,17 +296,17 @@ void screenText()
         sprintf(timeElapsedArray, "%.2f", timeElapsed);
         if (!completionStatus)
         {
-            renderText(widthOffset, baseHeight - 80, "Time elapsed: " + (string)timeElapsedArray + " seconds");
+            renderText(widthOffset, baseHeight - 100, "Time elapsed: " + (string)timeElapsedArray + " seconds");
         }
         else
         {
             if (highScoreBeat())
             {
-                renderText(widthOffset, baseHeight - 80, "You Won. You took: " + (string)timeElapsedArray + " seconds");
+                renderText(widthOffset, baseHeight - 100, "You Won. You took: " + (string)timeElapsedArray + " seconds");
             }
             else
             {
-                renderText(widthOffset, baseHeight - 80, "You didn't win. You took: " + (string)timeElapsedArray + " seconds");
+                renderText(widthOffset, baseHeight - 100, "You didn't win. You took: " + (string)timeElapsedArray + " seconds");
             }
         }
     }
@@ -389,7 +397,7 @@ void autoTilt()
     {
         xIncr = 0;
     }
-    if (zIncr >= -0.01 && zIncr <= 0.01)
+    if (zIncr >= -0.1 && zIncr <= 0.1)
     {
         zIncr = 0;
     }
@@ -491,6 +499,9 @@ void keyboard(unsigned char key, int x, int y)
         {
             cout << "Please place a file in root directory titled board.txt. Refer to readme for more information." << endl;
         }
+        break;
+    case '0':
+        debugMode = !debugMode;
         break;
     case 27:
     case 'q':
