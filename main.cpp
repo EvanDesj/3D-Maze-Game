@@ -321,8 +321,11 @@ void display()
 
     // Render HUD
     HUDinterface.setOrthographicProjection(&windowWidth, &windowHeight);
-    HUDinterface.draw(0, windowHeight-100);
+    HUDinterface.draw(0, 0);
 
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(45, 1, 1, 100);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(camera.getX(), camera.getY(), camera.getZ(), 0, 0, 0, camera.rotX, camera.rotY, camera.rotZ);
