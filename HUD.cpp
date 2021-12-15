@@ -3,7 +3,7 @@
 
 
 HUD::HUD(){
-    std::string filename = "assets/hud1.ppm";
+    std::string filename = "assets/brickTexture_1.ppm";
     int len = filename.size();
     char * HUDfilename = new char[len + 1];
     std::copy(filename.begin(), filename.end(), HUDfilename);

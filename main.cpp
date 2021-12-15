@@ -321,7 +321,7 @@ void display()
 
     // Render HUD
     HUDinterface.setOrthographicProjection(&windowWidth, &windowHeight);
-    HUDinterface.draw(0, 0);
+    HUDinterface.draw(20, 100);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
