@@ -43,8 +43,8 @@ float yIncr = 0;
 float zIncr = 0;
 // ------------------------//
 int timerFunc = 15; // Duration between animation frames, lower is better
-int windowWidth = 600;
-int windowHeight = 600;
+int windowWidth = 800;
+int windowHeight = 800;
 
 objl::Loader BallObject;        // Ball object where ball.obj will be loaded in
 bool ballTextureLoaded = false; // Boolean to check if the ball object has been loaded or not
@@ -441,6 +441,7 @@ bool outOfBounds()
     {
         return true;
     }
+    return false;
 }
 
 // Animate Callback FunctionO
@@ -739,8 +740,7 @@ int main(int argc, char **argv)
 {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-    glutInitWindowSize(800, 800);
-    glutInitWindowPosition(100, 100);
+    glutInitWindowSize(windowWidth, windowHeight);
     glutCreateWindow(WINDOW_TITLE); //creates the window
     printInstructions();
     glutDisplayFunc(display);         //registers "display" as the display callback function
