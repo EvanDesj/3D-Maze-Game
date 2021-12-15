@@ -32,6 +32,7 @@ Final Project:
 #include "shapes/ball.h"
 #include "utils/levelManager.h"
 #include "utils/fileManager.h"
+#include "utils/mazeGen.h"
 #include <string.h>
 #include <chrono>
 using namespace std;
@@ -505,6 +506,12 @@ void keyboard(unsigned char key, int x, int y)
     case '3':
         Wall = level3;
         selectedLevel = "3";
+        boardReset();
+        break;
+    case '4':
+        // prettyPrintLevel(getMaze(11));
+        Wall = getMaze(11);
+        selectedLevel = "Random";
         boardReset();
         break;
     case '5':

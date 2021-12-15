@@ -23,11 +23,10 @@ bool FileManager::saveHighScore(string level, float score)
     {
         string levelName = i.first;
         float levelScore = i.second;
-        if (levelName == "Custom")
+        if (levelName != "Custom" && levelName != "Random")
         {
-            levelName = "c";
+            MyFile << levelName << "|" << levelScore << endl;
         }
-        MyFile << levelName << "|" << levelScore << endl;
     }
     MyFile.close();
     return true;
@@ -41,7 +40,7 @@ unordered_map<string, float> FileManager::getHighScores()
     levelScores["1"] = 0;
     levelScores["2"] = 0;
     levelScores["3"] = 0;
-    levelScores["4"] = 0;
+    levelScores["Random"] = 0;
     levelScores["Custom"] = 0;
     if (!MyReadFile.fail())
     {
@@ -49,10 +48,6 @@ unordered_map<string, float> FileManager::getHighScores()
         {
             string level, score;
             level = myText[0];
-            if (level == "c")
-            {
-                level = "Custom";
-            }
             score = myText.substr(2);
             levelScores[level] = stof(score);
         }
@@ -90,7 +85,7 @@ bool FileManager::loadLevel()
             }
         }
     }
-    // prettyPrintLevel();
+    // prettyPrintLevel(loadedLevel);
     return true;
 }
 
@@ -100,23 +95,23 @@ void FileManager::reset()
     loadedLevel = {{}};
 }
 
-void FileManager::prettyPrintLevel()
+void prettyPrintLevel(vector<vector<int>> level)
 {
-    for (size_t i = 0; i < loadedLevel.size(); i++)
+    for (size_t i = 0; i < level.size(); i++)
     {
         cout << "{";
-        for (size_t j = 0; j < loadedLevel[i].size(); j++)
+        for (size_t j = 0; j < level[i].size(); j++)
         {
-            if (j == loadedLevel[i].size() - 1)
+            if (j == level[i].size() - 1)
             {
-                cout << loadedLevel[i][j];
+                cout << level[i][j];
             }
             else
             {
-                cout << loadedLevel[i][j] << ",";
+                cout << level[i][j] << ",";
             }
         }
-        if (i == loadedLevel.size() - 1)
+        if (i == level.size() - 1)
         {
             cout << "}";
         }
@@ -125,4 +120,5 @@ void FileManager::prettyPrintLevel()
             cout << "},";
         }
     }
+    cout << endl;
 }
