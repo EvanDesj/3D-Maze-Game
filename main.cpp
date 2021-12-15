@@ -86,7 +86,7 @@ Material floorMat = Material(Colour(0.12f, 0.18f, 0.25f, 1.0f),
                              0.0f);
 
 // HUD variables
-HUD HUDinterface(stoi(selectedLevel)); 
+HUD HUDinterface(stoi(selectedLevel));
 
 vector<vector<int>> Wall = level1;
 int baseSize()
@@ -321,7 +321,7 @@ void display()
 
     // Render HUD
     int y = 170;
-    int* h = &y;
+    int *h = &y;
     HUDinterface.setOrthographicProjection(&windowWidth, &windowHeight);
     HUDinterface.draw(10, 425);
 
