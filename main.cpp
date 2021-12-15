@@ -88,7 +88,7 @@ Material floorMat = Material(Colour(0.12f, 0.18f, 0.25f, 1.0f),
 // HUD variables
 HUD HUDinterface; 
 
-vector<vector<int>> Wall = level1;
+vector<vector<int>> Wall = level3;
 int baseSize()
 {
     return Wall.size();
