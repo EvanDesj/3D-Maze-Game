@@ -5,15 +5,27 @@
 #include "../utils/material.h"
 #include "../utils/mathLib3D.h"
 
-Cube::Cube(Vec3D center, Vec3D size, Vec3D rotationAngle, Colour colour, Material material)
+// Include OpenGL/GLUT Libraries
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#include <GLUT/glut.h>
+#else
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <GL/freeglut.h>
+#endif
+
+Cube::Cube(Vec3D center, Vec3D size, Vec3D rotationAngle, Colour colour, Material material, int texture)
     : Shape(center, size, rotationAngle, colour, material)
 {
-    this->center = center;
-    this->size = size;
-    this->rotationAngle = rotationAngle;
-    this->colour = colour;
-    this->material = material;
-};
+            this->center = center;
+            this->size = size;
+            this->rotationAngle = rotationAngle;
+            this->colour = colour;
+            this->material = material;
+            this->texture = texture;
+}
 
 void Cube::draw()
 {

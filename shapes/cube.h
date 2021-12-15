@@ -18,8 +18,9 @@ public:
     Vec3D rotationAngle;
     Colour colour;
     Material material;
+    int texture;
 
-    Cube(Vec3D center, Vec3D size, Vec3D rotationAngle, Colour colour, Material material);
+    Cube(Vec3D center, Vec3D size, Vec3D rotationAngle, Colour colour, Material material, int texture);
 
     void draw();
 };

@@ -15,10 +15,6 @@ Final Project:
 #include <GL/glu.h>
 #include <GL/freeglut.h>
 #endif
-// If windows, include <windows.h> to get the API functions
-#ifdef _WIN32
-#include <windows.h>
-#endif
 
 // include standard libraries
 #include <iostream>
@@ -45,8 +41,8 @@ float xIncr = 0;
 float yIncr = 0;
 float zIncr = 0;
 // ------------------------//
-int timerFunc = 1; // Duration between animation frames, lower is better
-int windowWidth = 800;
+int timerFunc = 15; // Duration between animation frames, lower is better
+int windowWidth = 600;
 int windowHeight = 600;
 
 objl::Loader BallObject;        // Ball object where ball.obj will be loaded in
@@ -64,7 +60,7 @@ string selectedLevel = "1";
 //Texture variables
 int gridWidth, gridHeight;
 int floorWidth, floorHeight;
-GLuint textures[1];
+GLuint textures[2];
 
 //Lighting variables
 float light_pos0[] = {-7, 3, -1};
@@ -76,7 +72,8 @@ float spec[] = {0.55, 0.45, 0.55};
 float amb2[] = {0.20, 0.18, 0.15};
 float diff2[] = {0.37, 0.37, 0.20};
 float spec2[] = {0.26, 0.17, 0.20};
-//Material variables
+
+// //Material variables
 Material wallMat = Material('w');
 Material ballMat = Material('w');
 Material floorMat = Material(Colour(0.12f, 0.18f, 0.25f, 1.0f),
@@ -84,12 +81,11 @@ Material floorMat = Material(Colour(0.12f, 0.18f, 0.25f, 1.0f),
                              Colour(0.70f, 0.70f, 0.55f, 1.0f),
                              0.0f);
 
-vector<vector<int>> Wall = level1;
-int baseSize() {
-    return Wall.size();
-}
+// Begin walls at level1
+vector<vector<int>> walls = level1;
 
-Board gameBoard = Board(Vec3D(0, 0, 0), baseSize()); // Initialize game board
+// Initialize game board
+Board gameBoard = Board(Vec3D(0, 0, 0), walls.size(), walls);
 
 // Function to load ball
 void loadBall() {
@@ -185,40 +181,41 @@ void drawBox(GLfloat size) {
   }
 }
 
-// Function to render walls/maze
-void renderWalls() {
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, wallMat.ambient.getColour());
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, wallMat.diffuse.getColour());
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, wallMat.specular.getColour());
-    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 10);
-    glBindTexture(GL_TEXTURE_2D, textures[0]);
-    for (int i = 0; i < baseSize(); i++)
-    {
-        for (int j = 0; j < baseSize(); j++)
-        {
-            if (Wall[i][j] == 1)
-            {
-                glPushMatrix();
-                glTranslatef(i, 1, j);      // Draw wall at position (i,j) at fixed y position
-                drawBox(1);            // Draw cube of size 1
-                glPopMatrix();
-            }
-        }
-    }
-}
-void renderFloor()
-{
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, floorMat.ambient.getColour());
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, floorMat.diffuse.getColour());
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, floorMat.specular.getColour());
-    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 10);
-    glBindTexture(GL_TEXTURE_2D, textures[1]);
-    glEnable(GL_TEXTURE_GEN_S); //enable texture coordinate generation
-    glEnable(GL_TEXTURE_GEN_T);
-    gameBoard.draw();
-    glDisable(GL_TEXTURE_GEN_S); //enable texture coordinate generation
-    glDisable(GL_TEXTURE_GEN_T);
-}
+// // Function to render walls/maze
+// void renderWalls() {
+//     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, wallMat.ambient.getColour());
+//     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, wallMat.diffuse.getColour());
+//     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, wallMat.specular.getColour());
+//     glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 10);
+//     glBindTexture(GL_TEXTURE_2D, textures[0]);
+//     for (int i = 0; i < walls.size(); i++)
+//     {
+//         for (int j = 0; j < baseSize(); j++)
+//         {
+//             if (Wall[i][j] == 1)
+//             {
+//                 glPushMatrix();
+//                 glTranslatef(i, 1, j);      // Draw wall at position (i,j) at fixed y position
+//                 drawBox(1);            // Draw cube of size 1
+//                 glPopMatrix();
+//             }
+//         }
+//     }
+// }
+
+// void renderFloor()
+// {
+//     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, floorMat.ambient.getColour());
+//     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, floorMat.diffuse.getColour());
+//     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, floorMat.specular.getColour());
+//     glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 10);
+//     glBindTexture(GL_TEXTURE_2D, textures[1]);
+//     glEnable(GL_TEXTURE_GEN_S); //enable texture coordinate generation
+//     glEnable(GL_TEXTURE_GEN_T);
+//     gameBoard.draw();
+//     glDisable(GL_TEXTURE_GEN_S); //enable texture coordinate generation
+//     glDisable(GL_TEXTURE_GEN_T);
+// }
 
 void startTimer()
 {
@@ -255,7 +252,8 @@ void setLighting()
     glLightfv(GL_LIGHT1, GL_SPECULAR, spec2);
 }
 
-bool highScoreBeat() {
+bool highScoreBeat()
+{
     if (highScores[selectedLevel] == 0)
     {
         return true;
@@ -267,7 +265,8 @@ bool highScoreBeat() {
     return false;
 }
 
-void screenText() {
+void screenText()
+{
     glPushMatrix();
     renderText(-1, 12, 1, 0.5, 0.25, "Welcome");
     renderText(-4, 11, 1, 1, 0.25, "Use W,A,S,D to control board");
@@ -304,6 +303,30 @@ void screenText() {
     glPopMatrix();
 }
 
+void drawAxis()
+{
+    glPushMatrix();
+    glLineWidth(2);
+    glBegin(GL_LINES);
+
+    //x axis
+    glColor3f(1.0, 0.0, 0.0);
+    glVertex3f(0.0, 0.0, 0.0);
+    glVertex3f(10.0, 0.0, 0.0);
+
+    //y axis
+    glColor3f(0.0, 1.0, 0.0);
+    glVertex3f(0.0, 0.0, 0.0);
+    glVertex3f(0.0, 10.0, 0.0);
+
+    //z axis
+    glColor3f(0.0, 0.0, 1.0);
+    glVertex3f(0.0, 0.0, 0.0);
+    glVertex3f(0.0, 0.0, 10.0);
+    glEnd();
+    glPopMatrix();
+}
+
 // Display Callback Function
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -317,6 +340,7 @@ void display() {
 
     // Matrix so ball and walls also move as board rotates
     glPushMatrix();
+
     // Activate lighting
     setLighting();
 
@@ -324,22 +348,33 @@ void display() {
     glRotatef(0 + xIncr, 1, 0, 0);
     glRotatef(0 + yIncr, 0, 1, 0);
     glRotatef(0 + zIncr, 0, 0, 1);
-    renderFloor();
+
+    glEnable(GL_TEXTURE_GEN_S); //enable texture coordinate generation
+    glEnable(GL_TEXTURE_GEN_T);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, floorMat.ambient.getColour());
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, floorMat.diffuse.getColour());
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, floorMat.specular.getColour());
+    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 10);
+    glBindTexture(GL_TEXTURE_2D, textures[0]);
+    gameBoard.draw(0);
+
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, wallMat.ambient.getColour());
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, wallMat.diffuse.getColour());
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, wallMat.specular.getColour());
+    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 10);
+    glBindTexture(GL_TEXTURE_2D, textures[1]);
+    gameBoard.draw(1);
+    
+    glDisable(GL_TEXTURE_GEN_S); //enable texture coordinate generation
+    glDisable(GL_TEXTURE_GEN_T);
+
+    
 
     //Add Ball
     glPushMatrix();
     glDisable(GL_LIGHTING);
     renderBall();
     glEnable(GL_LIGHTING);
-    glPopMatrix();
-
-    // Add Walls
-    glPushMatrix();
-    glColor3f(1, 0, 1);
-    glTranslatef(-1 * (baseSize() / 2), 0, -1 * (baseSize() / 2)); // To offset maze to correct position to overlay maze over base board and fix alignment
-    glPushMatrix();
-    renderWalls();
-    glPopMatrix();
     glPopMatrix();
 
     glPopMatrix();
@@ -353,21 +388,21 @@ bool collisionDetected(float x, float z) {
     int posX, posZ = 0;
     if (xIncr < 0)
     {
-        posX = round(x - football.size + baseSize() / 2);
+        posX = round(x - football.size + walls.size() / 2);
     }
     else
     {
-        posX = round(x + football.size + baseSize() / 2);
+        posX = round(x + football.size + walls.size() / 2);
     }
     if (zIncr < 0)
     {
-        posZ = round(z + football.size + baseSize() / 2);
+        posZ = round(z + football.size + walls.size() / 2);
     }
     else
     {
-        posZ = round(z - football.size + baseSize() / 2);
+        posZ = round(z - football.size + walls.size() / 2);
     }
-    if (posX < baseSize() && posZ < baseSize() && Wall[posZ][posX]) // Check if a maze exists at ball's location
+    if (posX < walls.size() && posZ < walls.size() && walls[posZ][posX]) // Check if a maze exists at ball's location
     {
         return true;
     }
@@ -399,9 +434,9 @@ void updateBallPosition() {
 
 bool outOfBounds() {
     Point3D expectedPoint = football.nextPosition(xIncr, yIncr, zIncr); // Check where ball will be next due to current board's tilt
-    float posX = expectedPoint.x + baseSize() / 2;
-    float posZ = expectedPoint.z + baseSize() / 2;
-    if ((posX > baseSize() || posX < 0) || (posZ > baseSize() || posZ < 0))
+    float posX = expectedPoint.x + walls.size() / 2;
+    float posZ = expectedPoint.z + walls.size() / 2;
+    if ((posX > walls.size() || posX < 0) || (posZ > walls.size() || posZ < 0))
     {
         return true;
     }
@@ -431,12 +466,14 @@ void animate(int v) {
 };
 
 // Reshape Callback Function
-void reshape(int width, int height) {
+void reshape(int width, int height)
+{
     windowWidth = width;
     windowHeight = height;
 };
 
-Vec3D computeTiltDirection() {
+Vec3D computeTiltDirection()
+{
     Point3D cameraPos = Point3D(camera.getX(), camera.getY(), camera.getZ());
     Point3D center = Point3D(0, 0, 0);
     Vec3D ray = Vec3D::createVector(cameraPos, center);
@@ -444,7 +481,8 @@ Vec3D computeTiltDirection() {
     return ray;
 }
 
-void boardReset() {
+void boardReset()
+{
     xIncr = 0;
     yIncr = 0;
     zIncr = 0;
@@ -455,7 +493,7 @@ void boardReset() {
     beginTime = std::chrono::steady_clock::now();
     timerStarted = false;
     timeElapsed = 0;
-    gameBoard = Board(Vec3D(0, 0, 0), baseSize()); // Reinitialize game board
+    gameBoard = Board(Vec3D(0, 0, 0), walls.size(), walls); // Reinitialize game board
     highScores = fileManager.getHighScores();
     fileManager.reset();
 }
@@ -465,17 +503,17 @@ void keyboard(unsigned char key, int x, int y) {
     switch (key)
     {
     case '1':
-        Wall = level1;
+        walls = level1;
         selectedLevel = "1";
         boardReset();
         break;
     case '2':
-        Wall = level2;
+        walls = level2;
         selectedLevel = "2";
         boardReset();
         break;
     case '3':
-        Wall = level3;
+        walls = level3;
         selectedLevel = "3";
         boardReset();
         break;
@@ -483,7 +521,7 @@ void keyboard(unsigned char key, int x, int y) {
         selectedLevel = "Custom";
         if (fileManager.loadLevel())
         {
-            Wall = fileManager.loadedLevel;
+            walls = fileManager.loadedLevel;
             boardReset();
             cout << "Board loaded from external file" << endl;
         }
@@ -642,10 +680,14 @@ void setTexture(int i, const char *name, int width, int height) {
 }
 
 // Glut Initialization Function
-void init() {
-    loadBall(); // Load ball only once
-    glClearColor(0.05, 0.05, 0.05, 0);
+void init()
+{
+    // Load ball only once
+    loadBall();
+
+    glClearColor(0.5, 0.5, 0.5, 0);
     glColor3f(1, 1, 1);
+
     // Enable Lighting
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
@@ -654,11 +696,18 @@ void init() {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(45, 1, 1, 100);
+    
     // Enable texturing
     glEnable(GL_TEXTURE_2D);
     glGenTextures(2, textures);
-    setTexture(0, "assets/brickTexture_2.ppm", gridWidth, gridHeight);
-    setTexture(1, "assets/floor2.ppm", floorWidth, floorHeight);
+    setTexture(0, "assets/floor2.ppm", floorWidth, floorHeight);
+    setTexture(1, "assets/brickTexture_2.ppm", gridWidth, gridHeight);
+    
+
+    glEnable(GL_DEPTH_TEST);
+    glFrontFace(GL_CW);
+    glCullFace(GL_FRONT);
+    glEnable(GL_CULL_FACE);
 };
 
 // Print Program Instructions
@@ -686,11 +735,6 @@ int main(int argc, char **argv)
     glutDisplayFunc(display);         //registers "display" as the display callback function
     glutKeyboardFunc(keyboard);       //registers "keyboard" as the keyboard callback function
     glutSpecialFunc(specialKeyboard); //registers "specialKeyboard" as the special callback function
-
-    glEnable(GL_DEPTH_TEST);
-    glFrontFace(GL_CW);
-    glCullFace(GL_FRONT);
-    glEnable(GL_CULL_FACE);
     init();
     animate(1);
     glutMainLoop();
