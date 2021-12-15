@@ -13,7 +13,8 @@ public:
     int mHeight;
     GLubyte * mImage;
 
-	HUD();
+    HUD();
+	HUD(int selectedLevel);
 
 	void draw(int xRasterPosition, int yRasterPosition);
 	void setOrthographicProjection(int* viewportWidth, int* viewportHeight);
