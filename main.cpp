@@ -59,6 +59,7 @@ float timeElapsed = 0;
 Ball football = Ball(Point3D(0, 1, 0), 0.5, 0); // Initialize ball with base position (origin)
 CameraSystem camera = CameraSystem();           // Initialize camera system
 FileManager fileManager = FileManager();
+Maze_Path mazeGen = Maze_Path();
 unordered_map<string, float> highScores = fileManager.getHighScores();
 string selectedLevel = "1";
 
@@ -539,7 +540,7 @@ void keyboard(unsigned char key, int x, int y)
         break;
     case '4':
         // prettyPrintLevel(getMaze(11));
-        Wall = getMaze(11);
+        Wall = mazeGen.getMaze(25);
         selectedLevel = "Random";
         boardReset();
         break;
