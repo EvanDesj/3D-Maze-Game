@@ -32,6 +32,7 @@ Final Project:
 #include "shapes/ball.h"
 #include "utils/levelManager.h"
 #include "utils/fileManager.h"
+#include "utils/mazeGen.h"
 #include <string.h>
 #include <chrono>
 using namespace std;
@@ -58,6 +59,7 @@ float timeElapsed = 0;
 Ball football = Ball(Point3D(0, 1, 0), 0.5, 0); // Initialize ball with base position (origin)
 CameraSystem camera = CameraSystem();           // Initialize camera system
 FileManager fileManager = FileManager();
+Maze_Path mazeGen = Maze_Path();
 unordered_map<string, float> highScores = fileManager.getHighScores();
 string selectedLevel = "1";
 
@@ -271,11 +273,91 @@ bool highScoreBeat()
     return false;
 }
 
+string boolToText(bool val)
+{
+    if (val)
+    {
+        return "T";
+    }
+    return "F";
+}
+
+bool withinBoardLimits(int val)
+{
+    if (val < baseSize() && val >= 0)
+    {
+        return true;
+    }
+    return false;
+}
+
+bool allowedUp()
+{
+    int posX = ceil(football.position.x + baseSize() / 2);
+    int posZL = ceil(football.position.z + baseSize() / 2);
+    int posZR = floor(football.position.z + baseSize() / 2);
+    if (withinBoardLimits(posZL) && withinBoardLimits(posZR) && withinBoardLimits(posX - 1) && Wall[posZL][posX - 1] && Wall[posZR][posX - 1])
+    {
+        return false;
+    }
+    return true;
+}
+
+bool allowedDown()
+{
+    int posX = floor(football.position.x + baseSize() / 2);
+    int posZL = ceil(football.position.z + baseSize() / 2);
+    int posZR = floor(football.position.z + baseSize() / 2);
+    if (withinBoardLimits(posZL) && withinBoardLimits(posZR) && withinBoardLimits(posX + 1) && Wall[posZL][posX + 1] && Wall[posZR][posX + 1])
+    {
+        return false;
+    }
+    return true;
+}
+
+bool allowedLeft()
+{
+    int posXU = ceil(football.position.x + baseSize() / 2);
+    int posXD = floor(football.position.x + baseSize() / 2);
+    int posZ = ceil(football.position.z + baseSize() / 2);
+    if (withinBoardLimits(posXU) && withinBoardLimits(posXD) && withinBoardLimits(posZ - 1) && Wall[posZ - 1][posXU] && Wall[posZ - 1][posXD])
+    {
+        return false;
+    }
+    return true;
+}
+
+bool allowedRight()
+{
+    int posXU = ceil(football.position.x + baseSize() / 2);
+    int posXD = floor(football.position.x + baseSize() / 2);
+    int posZ = floor(football.position.z + baseSize() / 2);
+    if (withinBoardLimits(posXU) && withinBoardLimits(posXD) && withinBoardLimits(posZ + 1) && Wall[posZ + 1][posXU] && Wall[posZ + 1][posXD])
+    {
+        return false;
+    }
+    return true;
+}
+
+// Function to update ball's position
+void updateBallPosition()
+{
+    if ((xIncr < 0 && allowedUp()) || (xIncr > 0 && allowedDown()))
+    {
+        football.update(football.nextPosition(xIncr, 0, 0)); // Move ball up or down
+    }
+    if ((zIncr < 0 && allowedRight()) || (zIncr > 0 && allowedLeft()))
+    {
+        football.update(football.nextPosition(0, 0, zIncr)); // Move ball left or right
+    }
+}
+
 void screenText()
 {
     glBindTexture(GL_TEXTURE_2D, 0);
     float baseHeight = (float)windowHeight / 4;
     float widthOffset = 10;
+    // renderText(widthOffset, baseHeight - 100, "left: " + boolToText(allowedLeft()) + " , right: " + boolToText(allowedRight()) + " , up: " + boolToText(allowedUp()) + " , down: " + boolToText(allowedDown()));
     renderText(widthOffset, baseHeight, "Welcome");
     renderText(widthOffset, baseHeight - 20, "Use W,A,S,D to control board");
     renderText(widthOffset, baseHeight - 40, "Use arrow keys to control camera");
@@ -367,62 +449,11 @@ void display()
     glutSwapBuffers();
 };
 
-// Function to detect collision
-bool collisionDetected(float x, float z)
-{
-    int posX, posZ = 0;
-    if (xIncr < 0)
-    {
-        posX = round(x - football.size + baseSize() / 2);
-    }
-    else
-    {
-        posX = round(x + football.size + baseSize() / 2);
-    }
-    if (zIncr < 0)
-    {
-        posZ = round(z + football.size + baseSize() / 2);
-    }
-    else
-    {
-        posZ = round(z - football.size + baseSize() / 2);
-    }
-    if (posX < baseSize() && posZ < baseSize() && Wall[posZ][posX]) // Check if a maze exists at ball's location
-    {
-        return true;
-    }
-    return false;
-}
-
-// Function to update ball's position
-void updateBallPosition()
-{
-    Point3D expectedPoint = football.nextPosition(xIncr, yIncr, zIncr); // Check where ball will be next due to current board's tilt
-    if (!collisionDetected(expectedPoint.x, expectedPoint.z))
-    {
-        football.update(expectedPoint); // If no collision is detected, move ball to expected position
-        return;
-    }
-    // If collision is only detected on one axis, move ball along other axis if tilt is present.
-    expectedPoint = football.nextPosition(xIncr, 0, 0);
-    if (!collisionDetected(expectedPoint.x, expectedPoint.z))
-    {
-        football.update(expectedPoint);
-        return;
-    }
-    expectedPoint = football.nextPosition(0, 0, zIncr);
-    if (!collisionDetected(expectedPoint.x, expectedPoint.z))
-    {
-        football.update(expectedPoint);
-        return;
-    }
-}
-
 bool outOfBounds()
 {
-    Point3D expectedPoint = football.nextPosition(xIncr, yIncr, zIncr); // Check where ball will be next due to current board's tilt
-    float posX = expectedPoint.x + baseSize() / 2;
-    float posZ = expectedPoint.z + baseSize() / 2;
+    // Point3D expectedPoint = football.nextPosition(xIncr, yIncr, zIncr, Wall); // Check where ball will be next due to current board's tilt
+    float posX = football.position.x + baseSize() / 2;
+    float posZ = football.position.z + baseSize() / 2;
     if ((posX > baseSize() || posX < 0) || (posZ > baseSize() || posZ < 0))
     {
         return true;
@@ -430,6 +461,26 @@ bool outOfBounds()
     return false;
 }
 
+void autoTilt(){
+    if (xIncr > 0){
+        xIncr = xIncr - 0.1; 
+    }
+    if (xIncr < 0){
+        xIncr = xIncr + 0.1;
+    }
+    if (zIncr > 0){
+        zIncr = zIncr - 0.1; 
+    }
+    if (zIncr < 0){
+        zIncr = zIncr + 0.1;
+    }
+    if (xIncr >= -0.1 && xIncr <= 0.1){
+        xIncr = 0;
+    }
+    if (zIncr >= -0.1 && zIncr <= 0.1){
+        zIncr = 0;
+    }
+}
 // Animate Callback FunctionO
 void animate(int v)
 {
@@ -450,6 +501,7 @@ void animate(int v)
             fileManager.saveHighScore(selectedLevel, timeElapsed);
         }
     }
+    autoTilt();
     glutPostRedisplay();
     glutTimerFunc(timerFunc, animate, 0);
 };
@@ -505,6 +557,12 @@ void keyboard(unsigned char key, int x, int y)
     case '3':
         Wall = level3;
         selectedLevel = "3";
+        boardReset();
+        break;
+    case '4':
+        // prettyPrintLevel(getMaze(11));
+        Wall = mazeGen.getMaze(25);
+        selectedLevel = "Random";
         boardReset();
         break;
     case '5':
