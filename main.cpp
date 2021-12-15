@@ -134,7 +134,9 @@ void renderBall()
 {
     glBindTexture(GL_TEXTURE_2D, 0);
     glTranslatef(football.position.z, football.position.y, football.position.x);
-    glRotatef(football.rotationAngle, xIncr, yIncr, zIncr);
+    if (!(xIncr == 0 && zIncr == 0)) {
+        glRotatef(football.rotationAngle, xIncr, yIncr, zIncr);
+    }
     glScalef(football.size, football.size, football.size);
     drawFromObj(BallObject);
 }
