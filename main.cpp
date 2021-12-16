@@ -53,6 +53,7 @@ bool ballTextureLoaded = false; // Boolean to check if the ball object has been 
 bool completionStatus = false;
 std::chrono::steady_clock::time_point beginTime = std::chrono::steady_clock::now();
 bool timerStarted = false;
+bool consoleWarning = false;
 float timeElapsed = 0;
 Ball football = Ball(Point3D(0, 1, 0), 0.5, 0); // Initialize ball with base position (origin)
 CameraSystem camera = CameraSystem();           // Initialize camera system
@@ -153,6 +154,7 @@ void startTimer()
         beginTime = std::chrono::steady_clock::now();
         timerStarted = true;
     }
+    consoleWarning = false;
 }
 
 void renderText(int x, int y, string stringInput)
@@ -316,6 +318,9 @@ void screenText()
     {
         renderText(widthOffset, 40, "Not Started");
     }
+    if(consoleWarning){
+        renderText(10, windowHeight - 75, "Some error occurred. Please Look at console for more info.");
+    }
 }
 
 // Display Callback Function
@@ -453,7 +458,7 @@ Vec3D computeTiltDirection()
     return ray;
 }
 
-void boardReset()
+void gameReset()
 {
     HUDinterface.changeLevel(selectedLevel);
     xIncr = 0;
@@ -468,6 +473,7 @@ void boardReset()
     timeElapsed = 0;
     gameBoard = Board(Vec3D(0, 0, 0), baseSize(), Wall); // Reinitialize game board
     highScores = fileManager.getHighScores();
+    consoleWarning = false;
     fileManager.reset();
 }
 
@@ -479,34 +485,35 @@ void keyboard(unsigned char key, int x, int y)
     case '1':
         Wall = level1;
         selectedLevel = 1;
-        boardReset();
+        gameReset();
         break;
     case '2':
         Wall = level2;
         selectedLevel = 2;
-        boardReset();
+        gameReset();
         break;
     case '3':
         Wall = level3;
         selectedLevel = 3;
-        boardReset();
+        gameReset();
         break;
     case '4':
         // prettyPrintLevel(getMaze(11));
         Wall = mazeGen.getMaze(25);
         selectedLevel = 4;
-        boardReset();
+        gameReset();
         break;
     case '5':
         if (fileManager.loadLevel())
         {
             selectedLevel = 5;
             Wall = fileManager.loadedLevel;
-            boardReset();
+            gameReset();
             cout << "Board loaded from external file" << endl;
         }
         else
         {
+            consoleWarning=true;
             cout << "Please place a file in root directory titled board.txt. Refer to readme for more information." << endl;
         }
         break;
@@ -532,7 +539,7 @@ void keyboard(unsigned char key, int x, int y)
         break;
     case 'r':
     case 'R':
-        boardReset();
+        gameReset();
         break;
     // Update gameboard rotation
     case 'w':
