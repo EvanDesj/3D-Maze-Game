@@ -321,7 +321,7 @@ void screenText()
     }
     if (consoleWarning)
     {
-        renderText(10, windowHeight - 75, "Some error occurred. Please Look at console for more info.");
+        renderText(10, windowHeight - 75, "An unexpected error occurred. Please Look at console for more info.");
     }
 }
 
