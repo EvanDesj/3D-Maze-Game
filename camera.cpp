@@ -59,7 +59,7 @@ void CameraSystem::cameraDown()
 void CameraSystem::reset()
 {
     rotation = 0;
-    height = 30;
+    height = 35;
     radius = 30;
     rotX = 0;
     rotY = 2;

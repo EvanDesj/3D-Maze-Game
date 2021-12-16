@@ -328,17 +328,9 @@ void display()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Render HUD
-    // HUDinterface.setOrthographicProjection(&windowWidth, &windowHeight);
-    // HUDinterface.draw(10, windowHeight -200);
-
-    // glMatrixMode(GL_PROJECTION);
-    // glLoadIdentity();
-    // gluPerspective(45, 1, 1, 100);
-
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(camera.getX(), camera.getY(), camera.getZ(), 0, 0, 0, camera.rotX, camera.rotY, camera.rotZ);
+    gluLookAt(camera.getX(), camera.getY(), camera.getZ(), 0, -5, 0, camera.rotX, camera.rotY, camera.rotZ);
 
     glEnable(GL_LIGHTING);
     glColor3f(1, 1, 1);
@@ -373,10 +365,7 @@ void display()
     glLoadIdentity();
     glDisable(GL_LIGHTING);
     screenText();
-        // HUDinterface.setOrthographicProjection(&windowWidth, &windowHeight);
-    float baseHeight = (float)windowHeight / 4 ;
     HUDinterface.draw(0, 0);
-
 
     glEnable(GL_LIGHTING);
 
