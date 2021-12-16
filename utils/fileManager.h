@@ -15,8 +15,8 @@ private:
 public:
     FileManager();
     vector<vector<int>> loadedLevel;
-    unordered_map<string, float> getHighScores();
-    bool saveHighScore(string level, float score);
+    unordered_map<int, float> getHighScores();
+    bool saveHighScore(int level, float score);
     bool loadLevel();
     void reset();
 };

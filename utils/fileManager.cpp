@@ -5,14 +5,14 @@ FileManager::FileManager()
     return;
 }
 
-bool FileManager::saveHighScore(string level, float score)
+bool FileManager::saveHighScore(int level, float score)
 {
     if (highScoreSaved)
     {
         return false;
     }
     highScoreSaved = true;
-    unordered_map<string, float> scores = getHighScores();
+    unordered_map<int, float> scores = getHighScores();
     ofstream MyFile("save.txt");
     if (MyFile.fail())
     {
@@ -21,33 +21,31 @@ bool FileManager::saveHighScore(string level, float score)
     scores[level] = score;
     for (auto i : scores)
     {
-        string levelName = i.first;
+        int levelName = i.first;
         float levelScore = i.second;
-        if (levelName != "Custom" && levelName != "Random")
-        {
-            MyFile << levelName << "|" << levelScore << endl;
-        }
+        MyFile << levelName << "|" << levelScore << endl;
     }
     MyFile.close();
     return true;
 }
 
-unordered_map<string, float> FileManager::getHighScores()
+unordered_map<int, float> FileManager::getHighScores()
 {
     string myText;
     ifstream MyReadFile("save.txt");
-    unordered_map<string, float> levelScores;
-    levelScores["1"] = 0;
-    levelScores["2"] = 0;
-    levelScores["3"] = 0;
-    levelScores["Random"] = 0;
-    levelScores["Custom"] = 0;
+    unordered_map<int, float> levelScores;
+    levelScores[1] = 0;
+    levelScores[2] = 0;
+    levelScores[3] = 0;
+    levelScores[4] = 0;
+    levelScores[5] = 0;
     if (!MyReadFile.fail())
     {
         while (getline(MyReadFile, myText))
         {
-            string level, score;
-            level = myText[0];
+            int level;
+            string score;
+            level = stoi(string(1, (myText[0])));
             score = myText.substr(2);
             levelScores[level] = stof(score);
         }

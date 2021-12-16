@@ -50,6 +50,5 @@ void HUD::changeLevel(int selectedLevel){
     char * HUDfilename = new char[len + 1];
     std::copy(filename.begin(), filename.end(), HUDfilename);
     HUDfilename[len] = '\0';
-    std::cout << filename << "\n";
     this->mImage = LoadPPM(HUDfilename, &mWidth, &mHeight);
 }

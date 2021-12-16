@@ -15,10 +15,6 @@ Final Project:
 #include <GL/glu.h>
 #include <GL/freeglut.h>
 #endif
-// If windows, include <windows.h> to get the API functions
-#ifdef _WIN32
-#include <windows.h>
-#endif
 
 // include standard libraries
 #include <iostream>
@@ -62,8 +58,8 @@ Ball football = Ball(Point3D(0, 1, 0), 0.5, 0); // Initialize ball with base pos
 CameraSystem camera = CameraSystem();           // Initialize camera system
 FileManager fileManager = FileManager();
 Maze_Path mazeGen = Maze_Path();
-unordered_map<string, float> highScores = fileManager.getHighScores();
-string selectedLevel = "1";
+unordered_map<int, float> highScores = fileManager.getHighScores();
+int selectedLevel = 1;
 
 //Texture variables
 int gridWidth, gridHeight;
@@ -295,7 +291,7 @@ void screenText()
     if (highScores[selectedLevel] != 0)
     {
         float targetScore = highScores[selectedLevel];
-        renderText(widthOffset, 50, "Level: " + selectedLevel + " | Time to beat: " + to_string(targetScore).substr(0, 4));
+        renderText(widthOffset, 50, "Level: " + to_string(selectedLevel) + " | Time to beat: " + to_string(targetScore).substr(0, 4));
     }
     else
     {
@@ -460,7 +456,7 @@ Vec3D computeTiltDirection()
 
 void boardReset()
 {
-    HUDinterface.changeLevel(stoi(selectedLevel));
+    HUDinterface.changeLevel(selectedLevel);
     xIncr = 0;
     yIncr = 0;
     zIncr = 0;
@@ -483,29 +479,29 @@ void keyboard(unsigned char key, int x, int y)
     {
     case '1':
         Wall = level1;
-        selectedLevel = "1";
+        selectedLevel = 1;
         boardReset();
         break;
     case '2':
         Wall = level2;
-        selectedLevel = "2";
+        selectedLevel = 2;
         boardReset();
         break;
     case '3':
         Wall = level3;
-        selectedLevel = "3";
+        selectedLevel = 3;
         boardReset();
         break;
     case '4':
         // prettyPrintLevel(getMaze(11));
         Wall = mazeGen.getMaze(25);
-        selectedLevel = "Random";
+        selectedLevel = 4;
         boardReset();
         break;
     case '5':
-        selectedLevel = "Custom";
         if (fileManager.loadLevel())
         {
+            selectedLevel = 5;
             Wall = fileManager.loadedLevel;
             boardReset();
             cout << "Board loaded from external file" << endl;
@@ -537,7 +533,6 @@ void keyboard(unsigned char key, int x, int y)
         break;
     case 'r':
     case 'R':
-        camera.reset();
         boardReset();
         break;
     // Update gameboard rotation
