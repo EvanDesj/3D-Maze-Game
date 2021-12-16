@@ -276,46 +276,45 @@ void updateBallPosition()
 void screenText()
 {
     glBindTexture(GL_TEXTURE_2D, 0);
-    float baseHeight = (float)windowHeight;
-    float widthOffset = 10;
+    float widthOffset = windowWidth - 130;
     if (debugMode)
     {
-        renderText(widthOffset, baseHeight - 150, "Debug Mode:");
-        renderText(widthOffset, baseHeight - 175, "Allowed | Left: " + boolToText(allowedLeft()) + " , Right: " + boolToText(allowedRight()) + " , Up: " + boolToText(allowedUp()) + " , Down: " + boolToText(allowedDown()));
-        renderText(widthOffset, baseHeight - 200, "Ball Position | X: " + to_string(football.position.x) + " , Y: " + to_string(football.position.y) + " , Z: " + to_string(football.position.z));
-        renderText(widthOffset, baseHeight - 225, "Tilt | X: " + to_string(xIncr) + " , Y: " + to_string(yIncr) + " , Z: " + to_string(zIncr));
+        renderText(10, windowHeight - 150, "Debug Mode:");
+        renderText(10, windowHeight - 175, "Allowed | Left: " + boolToText(allowedLeft()) + " , Right: " + boolToText(allowedRight()) + " , Up: " + boolToText(allowedUp()) + " , Down: " + boolToText(allowedDown()));
+        renderText(10, windowHeight - 200, "Ball Position | X: " + to_string(football.position.x) + " , Y: " + to_string(football.position.y) + " , Z: " + to_string(football.position.z));
+        renderText(10, windowHeight - 225, "Tilt | X: " + to_string(xIncr) + " , Y: " + to_string(yIncr) + " , Z: " + to_string(zIncr));
     }
-    renderText(widthOffset, baseHeight, "Welcome");
-    renderText(widthOffset, baseHeight - 25, "Use W,A,S,D to control board");
-    renderText(widthOffset, baseHeight - 50, "Use arrow keys to control camera");
     if (highScores[selectedLevel] != 0)
     {
         float targetScore = highScores[selectedLevel];
-        renderText(widthOffset, 50, "Level: " + to_string(selectedLevel) + " | Time to beat: " + to_string(targetScore).substr(0, 4));
+        renderText(widthOffset, 125, to_string(targetScore).substr(0, 4));
     }
     else
     {
-        renderText(widthOffset, 50, "Level: " + selectedLevel);
+        renderText(widthOffset, 125, "No Record");
     }
     if (timeElapsed > 0)
     {
         char timeElapsedArray[10];
         sprintf(timeElapsedArray, "%.2f", timeElapsed);
-        if (!completionStatus)
-        {
-            renderText(widthOffset, 50, "Time elapsed: " + (string)timeElapsedArray + " seconds");
-        }
-        else
+        renderText(widthOffset, 40, (string)timeElapsedArray);
+        if (completionStatus)
         {
             if (highScoreBeat())
             {
-                renderText(widthOffset, baseHeight - 100, "You Won. You took: " + (string)timeElapsedArray + " seconds");
+                renderText(10, windowHeight - 20, "You won!");
+                renderText(10, windowHeight - 50, "Press r to reset, or change levels with 1-5 keys!");
             }
             else
             {
-                renderText(widthOffset, baseHeight - 100, "You didn't win. You took: " + (string)timeElapsedArray + " seconds");
+                renderText(10, windowHeight - 20, "Try again!");
+                renderText(10, windowHeight - 50, "Press r to try again, or change levels with 1-5 keys!");
             }
         }
+    }
+    else
+    {
+        renderText(widthOffset, 40, "Not Started");
     }
 }
 
