@@ -25,14 +25,15 @@ Final Project:
 #include <cmath>
 #include <list>
 #include <vector>
-#include "HUD.h"
 #include "camera.h"
 #include "board.h"
 #include "utils/PPM.h"
+#include "HUD.h"
 #include "utils/objectLoader.h"
 #include "shapes/ball.h"
 #include "utils/levelManager.h"
 #include "utils/fileManager.h"
+#include "utils/mazeGen.h"
 #include <string.h>
 #include <chrono>
 using namespace std;
@@ -41,15 +42,16 @@ using namespace std;
 #define WINDOW_TITLE "3GC3 Final Project - Labyrinth"
 
 // Configuration Variables (Modify before build)
+int timerFunc = 10; // Duration between animation frames, lower is better
+int windowWidth = 800;
+int windowHeight = 800;
+bool debugMode = false;
+
+// Do not modify
 // Global variables for gameboard rotation increments
 float xIncr = 0;
 float yIncr = 0;
 float zIncr = 0;
-// ------------------------//
-int timerFunc = 1; // Duration between animation frames, lower is better
-int windowWidth = 800;
-int windowHeight = 600;
-
 objl::Loader BallObject;        // Ball object where ball.obj will be loaded in
 bool ballTextureLoaded = false; // Boolean to check if the ball object has been loaded or not
 bool completionStatus = false;
@@ -59,13 +61,14 @@ float timeElapsed = 0;
 Ball football = Ball(Point3D(0, 1, 0), 0.5, 0); // Initialize ball with base position (origin)
 CameraSystem camera = CameraSystem();           // Initialize camera system
 FileManager fileManager = FileManager();
+Maze_Path mazeGen = Maze_Path();
 unordered_map<string, float> highScores = fileManager.getHighScores();
 string selectedLevel = "1";
 
 //Texture variables
 int gridWidth, gridHeight;
 int floorWidth, floorHeight;
-GLuint textures[1];
+GLuint textures[2];
 
 //Lighting variables
 float light_pos0[] = {-7, 3, -1};
@@ -77,24 +80,20 @@ float spec[] = {0.55, 0.45, 0.55};
 float amb2[] = {0.20, 0.18, 0.15};
 float diff2[] = {0.37, 0.37, 0.20};
 float spec2[] = {0.26, 0.17, 0.20};
-//Material variables
-Material wallMat = Material('w');
-Material ballMat = Material('w');
-Material floorMat = Material(Colour(0.12f, 0.18f, 0.25f, 1.0f),
-                             Colour(0.67f, 0.65f, 0.5f, 1.0f),
-                             Colour(0.70f, 0.70f, 0.55f, 1.0f),
-                             0.0f);
 
 // HUD variables
 HUD HUDinterface(stoi(selectedLevel));
 
+// Begin walls at level1
 vector<vector<int>> Wall = level1;
+
 int baseSize()
 {
     return Wall.size();
 }
 
-Board gameBoard = Board(Vec3D(0, 0, 0), baseSize()); // Initialize game board
+// Initialize game board
+Board gameBoard = Board(Vec3D(0, 0, 0), baseSize(), Wall);
 
 // Function to load ball
 void loadBall()
@@ -143,89 +142,12 @@ void renderBall()
 {
     glBindTexture(GL_TEXTURE_2D, 0);
     glTranslatef(football.position.z, football.position.y, football.position.x);
-    glRotatef(football.rotationAngle, xIncr, yIncr, zIncr);
+    if (!(xIncr == 0 && zIncr == 0))
+    {
+        glRotatef(football.rotationAngle, xIncr, yIncr, zIncr);
+    }
     glScalef(football.size, football.size, football.size);
     drawFromObj(BallObject);
-}
-
-void drawBox(GLfloat size)
-{
-    static GLfloat n[6][3] =
-        {
-            {-1.0, 0.0, 0.0},
-            {0.0, 1.0, 0.0},
-            {1.0, 0.0, 0.0},
-            {0.0, -1.0, 0.0},
-            {0.0, 0.0, 1.0},
-            {0.0, 0.0, -1.0}};
-    static GLint faces[6][4] =
-        {
-            {0, 1, 2, 3},
-            {3, 2, 6, 7},
-            {7, 6, 5, 4},
-            {4, 5, 1, 0},
-            {5, 6, 2, 1},
-            {7, 4, 0, 3}};
-    GLfloat v[8][3];
-    GLint i;
-
-    v[0][0] = v[1][0] = v[2][0] = v[3][0] = -size / 2;
-    v[4][0] = v[5][0] = v[6][0] = v[7][0] = size / 2;
-    v[0][1] = v[1][1] = v[4][1] = v[5][1] = -size / 2;
-    v[2][1] = v[3][1] = v[6][1] = v[7][1] = size / 2;
-    v[0][2] = v[3][2] = v[4][2] = v[7][2] = -size / 2;
-    v[1][2] = v[2][2] = v[5][2] = v[6][2] = size / 2;
-
-    for (i = 5; i >= 0; i--)
-    {
-        glBegin(GL_POLYGON);
-        glNormal3fv(&n[i][0]);
-        glTexCoord2f(1, 1);
-        glVertex3fv(&v[faces[i][0]][0]);
-        glTexCoord2f(1, 0);
-        glVertex3fv(&v[faces[i][1]][0]);
-        glTexCoord2f(0, 0);
-        glVertex3fv(&v[faces[i][2]][0]);
-        glTexCoord2f(0, 1);
-        glVertex3fv(&v[faces[i][3]][0]);
-        glEnd();
-    }
-}
-
-// Function to render walls/maze
-void renderWalls()
-{
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, wallMat.ambient.getColour());
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, wallMat.diffuse.getColour());
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, wallMat.specular.getColour());
-    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 10);
-    glBindTexture(GL_TEXTURE_2D, textures[0]);
-    for (int i = 0; i < baseSize(); i++)
-    {
-        for (int j = 0; j < baseSize(); j++)
-        {
-            if (Wall[i][j] == 1)
-            {
-                glPushMatrix();
-                glTranslatef(i, 1, j); // Draw wall at position (i,j) at fixed y position
-                drawBox(1);            // Draw cube of size 1
-                glPopMatrix();
-            }
-        }
-    }
-}
-void renderFloor()
-{
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, floorMat.ambient.getColour());
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, floorMat.diffuse.getColour());
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, floorMat.specular.getColour());
-    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 10);
-    glBindTexture(GL_TEXTURE_2D, textures[1]);
-    glEnable(GL_TEXTURE_GEN_S); //enable texture coordinate generation
-    glEnable(GL_TEXTURE_GEN_T);
-    gameBoard.draw();
-    glDisable(GL_TEXTURE_GEN_S); //enable texture coordinate generation
-    glDisable(GL_TEXTURE_GEN_T);
 }
 
 void startTimer()
@@ -239,6 +161,7 @@ void startTimer()
 
 void renderText(int x, int y, string stringInput)
 {
+    glColor3f(1, 1, 1);
     glRasterPos2f(x, y);
     int len, i;
     len = (int)stringInput.length();
@@ -275,22 +198,108 @@ bool highScoreBeat()
     return false;
 }
 
+string boolToText(bool val)
+{
+    if (val)
+    {
+        return "T";
+    }
+    return "F";
+}
+
+bool withinBoardLimits(int val)
+{
+    if (val < baseSize() && val >= 0)
+    {
+        return true;
+    }
+    return false;
+}
+
+bool allowedUp()
+{
+    int posX = ceil(football.position.x + baseSize() / 2);
+    int posZL = ceil(football.position.z + baseSize() / 2);
+    int posZR = floor(football.position.z + baseSize() / 2);
+    if (withinBoardLimits(posZL) && withinBoardLimits(posZR) && withinBoardLimits(posX - 1) && Wall[posZL][posX - 1] && Wall[posZR][posX - 1])
+    {
+        return false;
+    }
+    return true;
+}
+
+bool allowedDown()
+{
+    int posX = floor(football.position.x + baseSize() / 2);
+    int posZL = ceil(football.position.z + baseSize() / 2);
+    int posZR = floor(football.position.z + baseSize() / 2);
+    if (withinBoardLimits(posZL) && withinBoardLimits(posZR) && withinBoardLimits(posX + 1) && Wall[posZL][posX + 1] && Wall[posZR][posX + 1])
+    {
+        return false;
+    }
+    return true;
+}
+
+bool allowedLeft()
+{
+    int posXU = ceil(football.position.x + baseSize() / 2);
+    int posXD = floor(football.position.x + baseSize() / 2);
+    int posZ = ceil(football.position.z + baseSize() / 2);
+    if (withinBoardLimits(posXU) && withinBoardLimits(posXD) && withinBoardLimits(posZ - 1) && Wall[posZ - 1][posXU] && Wall[posZ - 1][posXD])
+    {
+        return false;
+    }
+    return true;
+}
+
+bool allowedRight()
+{
+    int posXU = ceil(football.position.x + baseSize() / 2);
+    int posXD = floor(football.position.x + baseSize() / 2);
+    int posZ = floor(football.position.z + baseSize() / 2);
+    if (withinBoardLimits(posXU) && withinBoardLimits(posXD) && withinBoardLimits(posZ + 1) && Wall[posZ + 1][posXU] && Wall[posZ + 1][posXD])
+    {
+        return false;
+    }
+    return true;
+}
+
+// Function to update ball's position
+void updateBallPosition()
+{
+    if ((xIncr < 0 && allowedUp()) || (xIncr > 0 && allowedDown()))
+    {
+        football.update(football.nextPosition(xIncr, 0, 0)); // Move ball up or down
+    }
+    if ((zIncr < 0 && allowedRight()) || (zIncr > 0 && allowedLeft()))
+    {
+        football.update(football.nextPosition(0, 0, zIncr)); // Move ball left or right
+    }
+}
+
 void screenText()
 {
     glBindTexture(GL_TEXTURE_2D, 0);
-    float baseHeight = (float)windowHeight / 4;
+    float baseHeight = (float)windowHeight;
     float widthOffset = 10;
+    if (debugMode)
+    {
+        renderText(widthOffset, baseHeight - 150, "Debug Mode:");
+        renderText(widthOffset, baseHeight - 175, "Allowed | Left: " + boolToText(allowedLeft()) + " , Right: " + boolToText(allowedRight()) + " , Up: " + boolToText(allowedUp()) + " , Down: " + boolToText(allowedDown()));
+        renderText(widthOffset, baseHeight - 200, "Ball Position | X: " + to_string(football.position.x) + " , Y: " + to_string(football.position.y) + " , Z: " + to_string(football.position.z));
+        renderText(widthOffset, baseHeight - 225, "Tilt | X: " + to_string(xIncr) + " , Y: " + to_string(yIncr) + " , Z: " + to_string(zIncr));
+    }
     renderText(widthOffset, baseHeight, "Welcome");
-    renderText(widthOffset, baseHeight - 20, "Use W,A,S,D to control board");
-    renderText(widthOffset, baseHeight - 40, "Use arrow keys to control camera");
+    renderText(widthOffset, baseHeight - 25, "Use W,A,S,D to control board");
+    renderText(widthOffset, baseHeight - 50, "Use arrow keys to control camera");
     if (highScores[selectedLevel] != 0)
     {
         float targetScore = highScores[selectedLevel];
-        renderText(widthOffset, baseHeight - 60, "Level: " + selectedLevel + " | Time to beat: " + to_string(targetScore).substr(0, 4));
+        renderText(widthOffset, baseHeight - 75, "Level: " + selectedLevel + " | Time to beat: " + to_string(targetScore).substr(0, 4));
     }
     else
     {
-        renderText(widthOffset, baseHeight - 60, "Level: " + selectedLevel);
+        renderText(widthOffset, baseHeight - 75, "Level: " + selectedLevel);
     }
     if (timeElapsed > 0)
     {
@@ -298,17 +307,17 @@ void screenText()
         sprintf(timeElapsedArray, "%.2f", timeElapsed);
         if (!completionStatus)
         {
-            renderText(widthOffset, baseHeight - 80, "Time elapsed: " + (string)timeElapsedArray + " seconds");
+            renderText(widthOffset, baseHeight - 100, "Time elapsed: " + (string)timeElapsedArray + " seconds");
         }
         else
         {
             if (highScoreBeat())
             {
-                renderText(widthOffset, baseHeight - 80, "You Won. You took: " + (string)timeElapsedArray + " seconds");
+                renderText(widthOffset, baseHeight - 100, "You Won. You took: " + (string)timeElapsedArray + " seconds");
             }
             else
             {
-                renderText(widthOffset, baseHeight - 80, "You didn't win. You took: " + (string)timeElapsedArray + " seconds");
+                renderText(widthOffset, baseHeight - 100, "You didn't win. You took: " + (string)timeElapsedArray + " seconds");
             }
         }
     }
@@ -320,14 +329,13 @@ void display()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Render HUD
-    int y = 170;
-    int *h = &y;
-    HUDinterface.setOrthographicProjection(&windowWidth, &windowHeight);
-    HUDinterface.draw(10, 425);
+    // HUDinterface.setOrthographicProjection(&windowWidth, &windowHeight);
+    // HUDinterface.draw(10, windowHeight -200);
 
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(45, 1, 1, 100);
+    // glMatrixMode(GL_PROJECTION);
+    // glLoadIdentity();
+    // gluPerspective(45, 1, 1, 100);
+
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(camera.getX(), camera.getY(), camera.getZ(), 0, 0, 0, camera.rotX, camera.rotY, camera.rotZ);
@@ -337,6 +345,7 @@ void display()
 
     // Matrix so ball and walls also move as board rotates
     glPushMatrix();
+
     // Activate lighting
     setLighting();
 
@@ -344,22 +353,13 @@ void display()
     glRotatef(0 + xIncr, 1, 0, 0);
     glRotatef(0 + yIncr, 0, 1, 0);
     glRotatef(0 + zIncr, 0, 0, 1);
-    renderFloor();
+    gameBoard.draw(textures);
 
     //Add Ball
     glPushMatrix();
     glDisable(GL_LIGHTING);
     renderBall();
     glEnable(GL_LIGHTING);
-    glPopMatrix();
-
-    // Add Walls
-    glPushMatrix();
-    glColor3f(1, 0, 1);
-    glTranslatef(-1 * (baseSize() / 2), 0, -1 * (baseSize() / 2)); // To offset maze to correct position to overlay maze over base board and fix alignment
-    glPushMatrix();
-    renderWalls();
-    glPopMatrix();
     glPopMatrix();
 
     glPopMatrix();
@@ -371,7 +371,14 @@ void display()
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+    glDisable(GL_LIGHTING);
     screenText();
+        // HUDinterface.setOrthographicProjection(&windowWidth, &windowHeight);
+    float baseHeight = (float)windowHeight / 4 ;
+    HUDinterface.draw(0, 0);
+
+
+    glEnable(GL_LIGHTING);
 
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
@@ -381,67 +388,44 @@ void display()
     glutSwapBuffers();
 };
 
-// Function to detect collision
-bool collisionDetected(float x, float z)
-{
-    int posX, posZ = 0;
-    if (xIncr < 0)
-    {
-        posX = round(x - football.size + baseSize() / 2);
-    }
-    else
-    {
-        posX = round(x + football.size + baseSize() / 2);
-    }
-    if (zIncr < 0)
-    {
-        posZ = round(z + football.size + baseSize() / 2);
-    }
-    else
-    {
-        posZ = round(z - football.size + baseSize() / 2);
-    }
-    if (posX < baseSize() && posZ < baseSize() && Wall[posZ][posX]) // Check if a maze exists at ball's location
-    {
-        return true;
-    }
-    return false;
-}
-
-// Function to update ball's position
-void updateBallPosition()
-{
-    Point3D expectedPoint = football.nextPosition(xIncr, yIncr, zIncr); // Check where ball will be next due to current board's tilt
-    if (!collisionDetected(expectedPoint.x, expectedPoint.z))
-    {
-        football.update(expectedPoint); // If no collision is detected, move ball to expected position
-        return;
-    }
-    // If collision is only detected on one axis, move ball along other axis if tilt is present.
-    expectedPoint = football.nextPosition(xIncr, 0, 0);
-    if (!collisionDetected(expectedPoint.x, expectedPoint.z))
-    {
-        football.update(expectedPoint);
-        return;
-    }
-    expectedPoint = football.nextPosition(0, 0, zIncr);
-    if (!collisionDetected(expectedPoint.x, expectedPoint.z))
-    {
-        football.update(expectedPoint);
-        return;
-    }
-}
-
 bool outOfBounds()
 {
-    Point3D expectedPoint = football.nextPosition(xIncr, yIncr, zIncr); // Check where ball will be next due to current board's tilt
-    float posX = expectedPoint.x + baseSize() / 2;
-    float posZ = expectedPoint.z + baseSize() / 2;
+    // Point3D expectedPoint = football.nextPosition(xIncr, yIncr, zIncr, Wall); // Check where ball will be next due to current board's tilt
+    float posX = football.position.x + baseSize() / 2;
+    float posZ = football.position.z + baseSize() / 2;
     if ((posX > baseSize() || posX < 0) || (posZ > baseSize() || posZ < 0))
     {
         return true;
     }
     return false;
+}
+
+void autoTilt()
+{
+    if (xIncr > 0)
+    {
+        xIncr = xIncr - 0.1;
+    }
+    if (xIncr < 0)
+    {
+        xIncr = xIncr + 0.1;
+    }
+    if (zIncr > 0)
+    {
+        zIncr = zIncr - 0.1;
+    }
+    if (zIncr < 0)
+    {
+        zIncr = zIncr + 0.1;
+    }
+    if (xIncr >= -0.1 && xIncr <= 0.1)
+    {
+        xIncr = 0;
+    }
+    if (zIncr >= -0.1 && zIncr <= 0.1)
+    {
+        zIncr = 0;
+    }
 }
 
 // Animate Callback FunctionO
@@ -464,6 +448,7 @@ void animate(int v)
             fileManager.saveHighScore(selectedLevel, timeElapsed);
         }
     }
+    autoTilt();
     glutPostRedisplay();
     glutTimerFunc(timerFunc, animate, 0);
 };
@@ -496,7 +481,7 @@ void boardReset()
     beginTime = std::chrono::steady_clock::now();
     timerStarted = false;
     timeElapsed = 0;
-    gameBoard = Board(Vec3D(0, 0, 0), baseSize()); // Reinitialize game board
+    gameBoard = Board(Vec3D(0, 0, 0), baseSize(), Wall); // Reinitialize game board
     highScores = fileManager.getHighScores();
     fileManager.reset();
 }
@@ -521,6 +506,12 @@ void keyboard(unsigned char key, int x, int y)
         selectedLevel = "3";
         boardReset();
         break;
+    case '4':
+        // prettyPrintLevel(getMaze(11));
+        Wall = mazeGen.getMaze(25);
+        selectedLevel = "Random";
+        boardReset();
+        break;
     case '5':
         selectedLevel = "Custom";
         if (fileManager.loadLevel())
@@ -533,6 +524,9 @@ void keyboard(unsigned char key, int x, int y)
         {
             cout << "Please place a file in root directory titled board.txt. Refer to readme for more information." << endl;
         }
+        break;
+    case '0':
+        debugMode = !debugMode;
         break;
     case 27:
     case 'q':
@@ -691,6 +685,7 @@ void init()
     loadBall(); // Load ball only once
     glClearColor(0.05, 0.05, 0.05, 0);
     glColor3f(1, 1, 1);
+
     // Enable Lighting
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
@@ -699,11 +694,17 @@ void init()
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(45, 1, 1, 100);
+
     // Enable texturing
     glEnable(GL_TEXTURE_2D);
     glGenTextures(2, textures);
-    setTexture(0, "assets/brickTexture_2.ppm", gridWidth, gridHeight);
-    setTexture(1, "assets/floor2.ppm", floorWidth, floorHeight);
+    setTexture(0, "assets/floor2.ppm", floorWidth, floorHeight);
+    setTexture(1, "assets/brickTexture_2.ppm", gridWidth, gridHeight);
+
+    glEnable(GL_DEPTH_TEST);
+    glFrontFace(GL_CW);
+    glCullFace(GL_FRONT);
+    glEnable(GL_CULL_FACE);
 };
 
 // Print Program Instructions
@@ -725,18 +726,12 @@ int main(int argc, char **argv)
 {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-    glutInitWindowSize(800, 800);
-    glutInitWindowPosition(100, 100);
+    glutInitWindowSize(windowWidth, windowHeight);
     glutCreateWindow(WINDOW_TITLE); //creates the window
     printInstructions();
     glutDisplayFunc(display);         //registers "display" as the display callback function
     glutKeyboardFunc(keyboard);       //registers "keyboard" as the keyboard callback function
     glutSpecialFunc(specialKeyboard); //registers "specialKeyboard" as the special callback function
-
-    glEnable(GL_DEPTH_TEST);
-    glFrontFace(GL_CW);
-    glCullFace(GL_FRONT);
-    glEnable(GL_CULL_FACE);
     init();
     animate(1);
     glutMainLoop();

@@ -8,68 +8,195 @@
 #include <GL/glu.h>
 #include <GL/freeglut.h>
 #endif
-// If windows, include <windows.h> to get the API functions
-#ifdef _WIN32
-#include <windows.h>
-#endif
 
 #include "board.h"
 #include "./shapes/shape.h"
 #include <math.h>
 #include <iostream>
+using namespace std;
 
-Board::Board(Vec3D center, int size)
+Board::Board(Vec3D center, int size, vector<vector<int>> wallInput)
 {
     this->center = center;
     this->size = size;
 
-    //create the gameboard
-    std::vector<std::vector<Cube>> board;
+    //vector to hold gameboard
+    vector<vector<vector<Cube>>> board;
 
-    //boards that have even length and width (like 8x8) do not have a center cube, meaning more camera and board math
-    //may not allow that type of board to exist, but this works for now.
-    float indexLimit = ((this->size - 1) / 2.0f);
+    //since we want board centred on the center point given,
+    int lowerIndexLimit = (int) (-1 * ceil((this->size - 1) / 2.0f));
+    int upperIndexLimit = (int) floor((this->size - 1) / 2.0f);
 
-    //i is the x pos of a cube, j is the z pos
-    for (int i = (int)(ceil(indexLimit) * -1); i <= (int)(floor(indexLimit)); i++)
+    //create arrays of cubes for the floor and walls
+    vector<vector<Cube>> floorBoard;
+    vector<vector<Cube>> wallsBoard;
+
+    //i is the x pos of a cube, k is the z pos
+    for (int i = lowerIndexLimit; i <= upperIndexLimit; i++)
     {
-        std::vector<Cube> row;
-        for (int j = (int)(ceil(indexLimit) * -1); j <= (int)(floor(indexLimit)); j++)
+        vector<Cube> wallsRow;
+        vector<Cube> floorRow;
+        for (int k = lowerIndexLimit; k <= upperIndexLimit; k++)
         {
-            row.push_back(Cube(Vec3D(i + this->center.x, 0.0f, j + this->center.y),
-                               Vec3D(1.0f, 1.0f, 1.0f),
-                               Vec3D(0.0f, 0.0f, 0.0f),
-                               Colour(0.36f, 0.27f, 0.54f, 1.0f),
-                               Material(
-                                   Colour(0.0f, 0.0f, 0.0f, 1.0f),
-                                   Colour(0.50f, 0.5f, 0.50f, 1.0f),
-                                   Colour(0.20f, 0.15f, 0.20f, 1.0f),
-                                   15.0f)));
+            //no floor vector, so cube is added for every floor position
+            floorRow.push_back(Cube(Vec3D(this->center.x + i, this->center.y, this->center.z + k),
+                                    Vec3D(1.0f, 1.0f, 1.0f),
+                                    Vec3D(0.0f, 0.0f, 0.0f),
+                                    Colour(1.0f, 1.0f, 1.0f, 1.0f),
+                                    Material(Colour(0.12f, 0.18f, 0.25f, 1.0f),
+                                             Colour(0.67f, 0.65f, 0.5f, 1.0f),
+                                             Colour(0.70f, 0.70f, 0.55f, 1.0f),
+                                             0.0f),
+                                    0));
+
+            //check if 1 at position in walls vector, push a cube at that positition if true
+            if (wallInput.at(i + (-1 * lowerIndexLimit)).at(k + (-1 * lowerIndexLimit)) == 1)
+            {
+                wallsRow.push_back(Cube(Vec3D(this->center.x + i, this->center.y + 1, this->center.z + k),
+                                        Vec3D(1.0f, 1.0f, 1.0f),
+                                        Vec3D(0.0f, 0.0f, 0.0f),
+                                        Colour(0.0f, 0.0f, 0.0f, 1.0f),
+                                        Material(
+                                            Colour(1, 0.95, 0.80, 1.0),
+                                            Colour(1, 1, 1, 1.0),
+                                            Colour(1, 1, 1, 1.0),
+                                            0.0f),
+                                        1));
+            
+            }
+            else //0 at position in walls, add a cube with NULL position, this is checked for when drawing board
+            {
+                wallsRow.push_back(Cube(Vec3D(this->center.x + i, this->center.y + 1, this->center.z + k),
+                                        Vec3D(0.0f, 0.0f, 0.0f),
+                                        Vec3D(0.0f, 0.0f, 0.0f),
+                                        Colour(0.0f, 0.0f, 0.0f, 1.0f),
+                                        Material(
+                                            Colour(1, 0.95, 0.80, 1.0),
+                                            Colour(1, 1, 1, 1.0),
+                                            Colour(1, 1, 1, 1.0),
+                                            0.0f),
+                                        1));
+            }
         }
-        board.push_back(row);
+        wallsBoard.push_back(wallsRow);
+        floorBoard.push_back(floorRow);
     }
+    board.push_back(floorBoard);
+    board.push_back(wallsBoard);
     this->board = board;
 }
 
-void Board::draw()
+
+Board::Board(Vec3D center, int size, vector<vector<int>> wallInput, vector<vector<int>> floorInput)
 {
-    for (int i = 0; i < this->size; i++)
+    this->center = center;
+    this->size = size;
+
+    //vector to hold gameboard
+    vector<vector<vector<Cube>>> board;
+
+    //since we want board centred on the center point given,
+    int lowerIndexLimit = (int) (-1 * ceil((this->size - 1) / 2.0f));
+    int upperIndexLimit = (int) floor((this->size - 1) / 2.0f);
+
+    //create arrays of cubes for the floor and walls
+    vector<vector<Cube>> floorBoard;
+    vector<vector<Cube>> wallsBoard;
+
+    //i is the x pos of a cube, k is the z pos
+    for (int i = lowerIndexLimit; i <= upperIndexLimit; i++)
     {
-        for (int j = 0; j < this->size; j++)
+        vector<Cube> wallsRow;
+        vector<Cube> floorRow;
+        for (int k = lowerIndexLimit; k <= upperIndexLimit; k++)
         {
-            this->board[i][j].draw();
+            //check if 1 at position in floorInput, push a cube to floorRow at that positition if true
+            if (floorInput.at(i + (-1 * lowerIndexLimit)).at(k + (-1 * lowerIndexLimit)) == 1)
+            {
+                floorRow.push_back(Cube(Vec3D(this->center.x + i, this->center.y, this->center.z + k),
+                                        Vec3D(1.0f, 1.0f, 1.0f),
+                                        Vec3D(0.0f, 0.0f, 0.0f),
+                                        Colour(1.0f, 1.0f, 1.0f, 1.0f),
+                                        Material(
+                                            Colour(0.12f, 0.18f, 0.25f, 1.0f),
+                                            Colour(0.67f, 0.65f, 0.5f, 1.0f),
+                                            Colour(0.70f, 0.70f, 0.55f, 1.0f),
+                                            0.0f),
+                                        0));
+            }
+            else //0 at position in floorInput, add a cube with 0 size, this won't be rendered
+            {
+                floorRow.push_back(Cube(Vec3D(this->center.x + i, this->center.y, this->center.z + k),
+                                        Vec3D(0.0f, 0.0f, 0.0f),
+                                        Vec3D(0.0f, 0.0f, 0.0f),
+                                        Colour(1.0f, 1.0f, 1.0f, 1.0f),
+                                        Material(
+                                            Colour(0.12f, 0.18f, 0.25f, 1.0f),
+                                            Colour(0.67f, 0.65f, 0.5f, 1.0f),
+                                            Colour(0.70f, 0.70f, 0.55f, 1.0f),
+                                            0.0f),
+                                        0));
+            }
+            
+            //check if 1 at position in wallInput, push a cube to wallsRow at that positition if true
+            if (wallInput.at(i + (-1 * lowerIndexLimit)).at(k + (-1 * lowerIndexLimit)) == 1)
+            {
+                wallsRow.push_back(Cube(Vec3D(this->center.x + i, this->center.y + 1, this->center.z + k),
+                                        Vec3D(1.0f, 1.0f, 1.0f),
+                                        Vec3D(0.0f, 0.0f, 0.0f),
+                                        Colour(0.0f, 0.0f, 0.0f, 1.0f),
+                                        Material(
+                                            Colour(1, 0.95, 0.80, 1.0),
+                                            Colour(1, 1, 1, 1.0),
+                                            Colour(1, 1, 1, 1.0),
+                                            0.0f),
+                                        1));
+            
+            }
+            else //0 at position in wallInput, add a cube with 0 size, this won't be rendered
+            {
+                wallsRow.push_back(Cube(Vec3D(this->center.x + i, this->center.y + 1, this->center.z + k),
+                                        Vec3D(0.0f, 0.0f, 0.0f),
+                                        Vec3D(0.0f, 0.0f, 0.0f),
+                                        Colour(0.0f, 0.0f, 0.0f, 1.0f),
+                                        Material(
+                                            Colour(1, 0.95, 0.80, 1.0),
+                                            Colour(1, 1, 1, 1.0),
+                                            Colour(1, 1, 1, 1.0),
+                                            0.0f),
+                                        1));
+            }
         }
+        wallsBoard.push_back(wallsRow);
+        floorBoard.push_back(floorRow);
     }
+    board.push_back(floorBoard);
+    board.push_back(wallsBoard);
+    this->board = board;
 }
 
-void Board::rotate(Vec3D rotate)
-{
-    //float indexLimit = (this->size - 1) / 2;
-    for (int i = 0; i < this->size; i++)
-    {
+
+void Board::draw(GLuint textures[]) {
+    for (int i = 0; i < this->board.size(); i++)
+    {    
         for (int j = 0; j < this->size; j++)
         {
-            this->board[i][j].rotationAngle = this->board[i][j].rotationAngle.add(rotate);
+            for (int k = 0; k < this->size; k++)
+            {
+                Cube currentCube = this->board.at(i).at(j).at(k);
+                if (currentCube.size.x != 0)
+                {   
+                    // glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, currentCube.material.ambient.getColour());
+                    // glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, currentCube.material.diffuse.getColour());
+                    // glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, currentCube.material.specular.getColour());
+                    // glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 10);
+                    // glBindTexture(GL_TEXTURE_2D, textures[currentCube.texture]);
+                    glPushMatrix();
+                    // glTranslatef(currentCube.center.x, currentCube.center.y, currentCube.center.z);
+                    this->board.at(i).at(j).at(k).drawBox(textures, 1);
+                    glPopMatrix();
+                }
+            }
         }
     }
 }
