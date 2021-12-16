@@ -304,12 +304,12 @@ void screenText()
         {
             if (highScoreBeat())
             {
-                renderText(10, windowHeight - 20, "You won!");
+                renderText(10, windowHeight - 25, "You won!");
                 renderText(10, windowHeight - 50, "Press r to reset, or change levels with 1-5 keys!");
             }
             else
             {
-                renderText(10, windowHeight - 20, "Try again!");
+                renderText(10, windowHeight - 25, "Try again!");
                 renderText(10, windowHeight - 50, "Press r to try again, or change levels with 1-5 keys!");
             }
         }
@@ -318,7 +318,8 @@ void screenText()
     {
         renderText(widthOffset, 40, "Not Started");
     }
-    if(consoleWarning){
+    if (consoleWarning)
+    {
         renderText(10, windowHeight - 75, "Some error occurred. Please Look at console for more info.");
     }
 }
@@ -513,7 +514,7 @@ void keyboard(unsigned char key, int x, int y)
         }
         else
         {
-            consoleWarning=true;
+            consoleWarning = true;
             cout << "Please place a file in root directory titled board.txt. Refer to readme for more information." << endl;
         }
         break;
