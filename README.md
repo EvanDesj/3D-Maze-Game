@@ -227,3 +227,7 @@ Since we are only computing the expected position of the ball and then checking 
   - Used with modifications and minor improvements 
 - **PPM Loader** : Taken from lectures and tutorial code
    - Used as is without modifications  
+- **Brick Wall Texture** : https://polycount.com/discussion/125954/show-your-hand-painted-stuff-pls/p20
+	- Used as is without modifications
+- **Floor Tile Texture** : https://www.3dxo.com/textures/3003_artificial_sandstone
+  - Used as is without modifications
