@@ -727,8 +727,8 @@ void init()
     // Enable texturing
     glEnable(GL_TEXTURE_2D);
     glGenTextures(2, textures);
-    setTexture(0, "assets/floor2.ppm", floorWidth, floorHeight);
-    setTexture(1, "assets/brickTexture_2.ppm", gridWidth, gridHeight);
+    setTexture(0, "assets/floor.ppm", floorWidth, floorHeight);
+    setTexture(1, "assets/brickTexture.ppm", gridWidth, gridHeight);
 
     glEnable(GL_DEPTH_TEST);
     glFrontFace(GL_CW);
