@@ -24,6 +24,7 @@ There is a timer that starts as soon as the board is tilted. The goal is to beat
   - [Updated Collision Detection](#updated-collision-detection)
   - [Web Application for Board Management](#web-application-for-board-management)
   - [HUD](#hud)
+  - [Winning Condition](#winning-condition)
   - [Board Tilt Based on Camera Movement](#board-tilt-based-on-camera-movement)
 - [Instructions to run](#instructions-to-run)
   - [- E: Export current board/maze to "board.txt"](#--e-export-current-boardmaze-to-boardtxt)
@@ -100,6 +101,9 @@ There is a timer that starts as soon as the board is tilted. The goal is to beat
 > Located in [HUD.h](HUD.h)
 - A base Heads Up Display has been added to the application.
 - This display shows the basic controls, as well as the target score and current score
+  
+## Winning Condition
+- Player wins when the ball escapes the maze.
   
 ## Board Tilt Based on Camera Movement
 - The board now tilts based on camera's position.
