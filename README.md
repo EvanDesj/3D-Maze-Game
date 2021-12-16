@@ -1,4 +1,3 @@
-
 # 3GC3 Final Project (Fall 2021)
 
 Authors:
@@ -111,8 +110,8 @@ This is the ball that is placed on the board, and it moves and rotates as the bo
 A basic collision detection algorithm has been implemented. This algorithm is run on every animation cycle.
 The way this works is:
 - On every animation cycle, we detect where the ball will be next, based on the current tilt of the board.
-- If the ball (or it's boundaries) appears to be in the same position as where a wall exists, we stop the ball from moving into that location).
-- We do this again, but with tilt on only one axis, to determine if the movement towards another axis allows the ball to move without collision
+- If the ball (or its boundaries) appears to be in the same position as where a wall exists, we stop the ball from moving into that location.
+- We do this again, but with tilt on only one axis, to determine if the movement towards another axis allows the ball to move without collision.
 - If collision is not detected on both axis, we allow the ball to move freely towards the direction of the tilt.
 - If collision is only detected on one axis, we allow the ball to move towards the other axis.
 - If collision is detected on both axis, we do not allow the ball to move.
