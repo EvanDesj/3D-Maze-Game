@@ -14,10 +14,10 @@ public:
     GLubyte * mImage;
 
     HUD();
-	HUD(int selectedLevel);
 
 	void draw(int xRasterPosition, int yRasterPosition);
 	void setOrthographicProjection(int* viewportWidth, int* viewportHeight);
+	void changeLevel(int selectedLevel);
 };
 
 #endif

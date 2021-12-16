@@ -82,7 +82,7 @@ float diff2[] = {0.37, 0.37, 0.20};
 float spec2[] = {0.26, 0.17, 0.20};
 
 // HUD variables
-HUD HUDinterface(stoi(selectedLevel));
+HUD HUDinterface = HUD();
 
 // Begin walls at level1
 vector<vector<int>> Wall = level1;
@@ -295,11 +295,11 @@ void screenText()
     if (highScores[selectedLevel] != 0)
     {
         float targetScore = highScores[selectedLevel];
-        renderText(widthOffset, baseHeight - 75, "Level: " + selectedLevel + " | Time to beat: " + to_string(targetScore).substr(0, 4));
+        renderText(widthOffset, 50, "Level: " + selectedLevel + " | Time to beat: " + to_string(targetScore).substr(0, 4));
     }
     else
     {
-        renderText(widthOffset, baseHeight - 75, "Level: " + selectedLevel);
+        renderText(widthOffset, 50, "Level: " + selectedLevel);
     }
     if (timeElapsed > 0)
     {
@@ -307,7 +307,7 @@ void screenText()
         sprintf(timeElapsedArray, "%.2f", timeElapsed);
         if (!completionStatus)
         {
-            renderText(widthOffset, baseHeight - 100, "Time elapsed: " + (string)timeElapsedArray + " seconds");
+            renderText(widthOffset, 50, "Time elapsed: " + (string)timeElapsedArray + " seconds");
         }
         else
         {
@@ -365,7 +365,7 @@ void display()
     glLoadIdentity();
     glDisable(GL_LIGHTING);
     screenText();
-    HUDinterface.draw(0, 0);
+    HUDinterface.draw(0, 20);
 
     glEnable(GL_LIGHTING);
 
@@ -460,6 +460,7 @@ Vec3D computeTiltDirection()
 
 void boardReset()
 {
+    HUDinterface.changeLevel(stoi(selectedLevel));
     xIncr = 0;
     yIncr = 0;
     zIncr = 0;
@@ -672,7 +673,7 @@ void setTexture(int i, const char *name, int width, int height)
 void init()
 {
     loadBall(); // Load ball only once
-    glClearColor(0.05, 0.05, 0.05, 0);
+    glClearColor(0.0, 0.0, 0.0, 0);
     glColor3f(1, 1, 1);
 
     // Enable Lighting
