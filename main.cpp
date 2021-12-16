@@ -24,6 +24,7 @@ Final Project:
 #include "camera.h"
 #include "board.h"
 #include "utils/PPM.h"
+#include "HUD.h"
 #include "utils/objectLoader.h"
 #include "shapes/ball.h"
 #include "utils/levelManager.h"
@@ -52,13 +53,14 @@ bool ballTextureLoaded = false; // Boolean to check if the ball object has been 
 bool completionStatus = false;
 std::chrono::steady_clock::time_point beginTime = std::chrono::steady_clock::now();
 bool timerStarted = false;
+bool consoleWarning = false;
 float timeElapsed = 0;
 Ball football = Ball(Point3D(0, 1, 0), 0.5, 0); // Initialize ball with base position (origin)
 CameraSystem camera = CameraSystem();           // Initialize camera system
 FileManager fileManager = FileManager();
 Maze_Path mazeGen = Maze_Path();
-unordered_map<string, float> highScores = fileManager.getHighScores();
-string selectedLevel = "1";
+unordered_map<int, float> highScores = fileManager.getHighScores();
+int selectedLevel = 1;
 
 //Texture variables
 int gridWidth, gridHeight;
@@ -75,6 +77,9 @@ float spec[] = {0.55, 0.45, 0.55};
 float amb2[] = {0.20, 0.18, 0.15};
 float diff2[] = {0.37, 0.37, 0.20};
 float spec2[] = {0.26, 0.17, 0.20};
+
+// HUD variables
+HUD HUDinterface = HUD();
 
 // Begin walls at level1
 vector<vector<int>> Wall = level1;
@@ -149,6 +154,7 @@ void startTimer()
         beginTime = std::chrono::steady_clock::now();
         timerStarted = true;
     }
+    consoleWarning = false;
 }
 
 void renderText(int x, int y, string stringInput)
@@ -272,46 +278,48 @@ void updateBallPosition()
 void screenText()
 {
     glBindTexture(GL_TEXTURE_2D, 0);
-    float baseHeight = (float)windowHeight / 3;
-    float widthOffset = 10;
+    float widthOffset = windowWidth - 130;
     if (debugMode)
     {
-        renderText(widthOffset, baseHeight - 150, "Debug Mode:");
-        renderText(widthOffset, baseHeight - 175, "Allowed | Left: " + boolToText(allowedLeft()) + " , Right: " + boolToText(allowedRight()) + " , Up: " + boolToText(allowedUp()) + " , Down: " + boolToText(allowedDown()));
-        renderText(widthOffset, baseHeight - 200, "Ball Position | X: " + to_string(football.position.x) + " , Y: " + to_string(football.position.y) + " , Z: " + to_string(football.position.z));
-        renderText(widthOffset, baseHeight - 225, "Tilt | X: " + to_string(xIncr) + " , Y: " + to_string(yIncr) + " , Z: " + to_string(zIncr));
+        renderText(10, windowHeight - 150, "Debug Mode:");
+        renderText(10, windowHeight - 175, "Allowed | Left: " + boolToText(allowedLeft()) + " , Right: " + boolToText(allowedRight()) + " , Up: " + boolToText(allowedUp()) + " , Down: " + boolToText(allowedDown()));
+        renderText(10, windowHeight - 200, "Ball Position | X: " + to_string(football.position.x) + " , Y: " + to_string(football.position.y) + " , Z: " + to_string(football.position.z));
+        renderText(10, windowHeight - 225, "Tilt | X: " + to_string(xIncr) + " , Y: " + to_string(yIncr) + " , Z: " + to_string(zIncr));
     }
-    renderText(widthOffset, baseHeight, "Welcome");
-    renderText(widthOffset, baseHeight - 25, "Use W,A,S,D to control board");
-    renderText(widthOffset, baseHeight - 50, "Use arrow keys to control camera");
     if (highScores[selectedLevel] != 0)
     {
         float targetScore = highScores[selectedLevel];
-        renderText(widthOffset, baseHeight - 75, "Level: " + selectedLevel + " | Time to beat: " + to_string(targetScore).substr(0, 4));
+        renderText(widthOffset, 125, to_string(targetScore).substr(0, 4));
     }
     else
     {
-        renderText(widthOffset, baseHeight - 75, "Level: " + selectedLevel);
+        renderText(widthOffset, 125, "No Record");
     }
     if (timeElapsed > 0)
     {
         char timeElapsedArray[10];
         sprintf(timeElapsedArray, "%.2f", timeElapsed);
-        if (!completionStatus)
-        {
-            renderText(widthOffset, baseHeight - 100, "Time elapsed: " + (string)timeElapsedArray + " seconds");
-        }
-        else
+        renderText(widthOffset, 40, (string)timeElapsedArray);
+        if (completionStatus)
         {
             if (highScoreBeat())
             {
-                renderText(widthOffset, baseHeight - 100, "You Won. You took: " + (string)timeElapsedArray + " seconds");
+                renderText(10, windowHeight - 20, "You won!");
+                renderText(10, windowHeight - 50, "Press r to reset, or change levels with 1-5 keys!");
             }
             else
             {
-                renderText(widthOffset, baseHeight - 100, "You didn't win. You took: " + (string)timeElapsedArray + " seconds");
+                renderText(10, windowHeight - 20, "Try again!");
+                renderText(10, windowHeight - 50, "Press r to try again, or change levels with 1-5 keys!");
             }
         }
+    }
+    else
+    {
+        renderText(widthOffset, 40, "Not Started");
+    }
+    if(consoleWarning){
+        renderText(10, windowHeight - 75, "Some error occurred. Please Look at console for more info.");
     }
 }
 
@@ -319,9 +327,10 @@ void screenText()
 void display()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(camera.getX(), camera.getY(), camera.getZ(), 0, 0, 0, camera.rotX, camera.rotY, camera.rotZ);
+    gluLookAt(camera.getX(), camera.getY(), camera.getZ(), 0, -5, 0, camera.rotX, camera.rotY, camera.rotZ);
 
     glEnable(GL_LIGHTING);
     glColor3f(1, 1, 1);
@@ -356,6 +365,8 @@ void display()
     glLoadIdentity();
     glDisable(GL_LIGHTING);
     screenText();
+    HUDinterface.draw(0, 20);
+
     glEnable(GL_LIGHTING);
 
     glMatrixMode(GL_PROJECTION);
@@ -447,8 +458,9 @@ Vec3D computeTiltDirection()
     return ray;
 }
 
-void boardReset()
+void gameReset()
 {
+    HUDinterface.changeLevel(selectedLevel);
     xIncr = 0;
     yIncr = 0;
     zIncr = 0;
@@ -461,6 +473,7 @@ void boardReset()
     timeElapsed = 0;
     gameBoard = Board(Vec3D(0, 0, 0), baseSize(), Wall); // Reinitialize game board
     highScores = fileManager.getHighScores();
+    consoleWarning = false;
     fileManager.reset();
 }
 
@@ -471,35 +484,36 @@ void keyboard(unsigned char key, int x, int y)
     {
     case '1':
         Wall = level1;
-        selectedLevel = "1";
-        boardReset();
+        selectedLevel = 1;
+        gameReset();
         break;
     case '2':
         Wall = level2;
-        selectedLevel = "2";
-        boardReset();
+        selectedLevel = 2;
+        gameReset();
         break;
     case '3':
         Wall = level3;
-        selectedLevel = "3";
-        boardReset();
+        selectedLevel = 3;
+        gameReset();
         break;
     case '4':
         // prettyPrintLevel(getMaze(11));
         Wall = mazeGen.getMaze(25);
-        selectedLevel = "Random";
-        boardReset();
+        selectedLevel = 4;
+        gameReset();
         break;
     case '5':
-        selectedLevel = "Custom";
         if (fileManager.loadLevel())
         {
+            selectedLevel = 5;
             Wall = fileManager.loadedLevel;
-            boardReset();
+            gameReset();
             cout << "Board loaded from external file" << endl;
         }
         else
         {
+            consoleWarning=true;
             cout << "Please place a file in root directory titled board.txt. Refer to readme for more information." << endl;
         }
         break;
@@ -525,8 +539,7 @@ void keyboard(unsigned char key, int x, int y)
         break;
     case 'r':
     case 'R':
-        camera.reset();
-        boardReset();
+        gameReset();
         break;
     // Update gameboard rotation
     case 'w':
@@ -661,7 +674,7 @@ void setTexture(int i, const char *name, int width, int height)
 void init()
 {
     loadBall(); // Load ball only once
-    glClearColor(0.05, 0.05, 0.05, 0);
+    glClearColor(0.0, 0.0, 0.0, 0);
     glColor3f(1, 1, 1);
 
     // Enable Lighting
