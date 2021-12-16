@@ -134,7 +134,7 @@ Use the following keys for interaction:
  - 0: Toggle Debug Mode
  - 1-3: Predefined Levels
  - 4: Random Automatically Generated Maze
- - 5: Load Board/Maze from "board.txt"
+ - 5: Load Board/Maze from "board.txt" (https://3gc3.anantj.repl.co/)
  - E: Export current board/maze to "board.txt"
   
 ---
