@@ -43,6 +43,26 @@ int windowWidth = 800;
 int windowHeight = 800;
 bool debugMode = false;
 
+// Print Program Instructions
+void printInstructions()
+{
+    using namespace std;
+    cout << "Program Instructions:" << endl;
+    cout << "Use q/Q to close the program at any time." << endl;
+    cout << "Use U and J to zoom in and out with the camera." << endl;
+    cout << "Use the left and right arrow keys to move the camera around the board." << endl;
+    cout << "Use the up and down arrow keys to move the camera above and below the board." << endl;
+    cout << "Use C to reset the camera to its initial view." << endl;
+    cout << "Use W,A,S,D to tilt the gameboard. This allows the ball to roll in the direction the board is tilted if there are no walls obstructing it." << endl;
+    cout << "Use R to reset the game." << endl;
+    cout << "Use I to print this instructions menu." << endl;
+    cout << "Use 0 to toggle debug menu." << endl;
+    cout << "Use 1-3 to select predefined levels." << endl;
+    cout << "Use 4 to select randomly generated level." << endl;
+    cout << "Use 5 to load game from board.txt" << endl;
+    cout << "Use E to export current game to board.txt" << endl;
+}
+
 // Do not modify
 // Global variables for gameboard rotation increments
 float xIncr = 0;
@@ -531,6 +551,10 @@ void keyboard(unsigned char key, int x, int y)
             cout << "Board could not be saved. Please try again later" << endl;
         }
         break;
+    case 'i':
+    case 'I':
+        printInstructions();
+        break;
     case '0':
         debugMode = !debugMode;
         break;
@@ -711,20 +735,6 @@ void init()
     glCullFace(GL_FRONT);
     glEnable(GL_CULL_FACE);
 };
-
-// Print Program Instructions
-void printInstructions()
-{
-    using namespace std;
-    cout << "Program Instructions:" << endl;
-    cout << "Use q to close the program at any time." << endl;
-    cout << "Use u and j to zoom in and out with the camera." << endl;
-    cout << "Use the left and right arrow keys to move the camera around the board." << endl;
-    cout << "Use the up and down arrow keys to move the camera above and below the board." << endl;
-    cout << "Use c to reset the camera to its initial view." << endl;
-    cout << "Use w,a,s,d to tilt the gameboard. This allows the ball to roll in the direction the board is tilted if there are no walls obstructing it." << endl;
-    cout << "Use r to reset the program." << endl;
-}
 
 // Main program
 int main(int argc, char **argv)

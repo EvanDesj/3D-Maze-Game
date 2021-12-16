@@ -130,6 +130,7 @@ Use the following keys for interaction:
  - J: Camera Zoom Out
  - C: Camera Reset
  - R: Reset Game
+ - I: Instructions menu on console
  - Q: Quit
  - 0: Toggle Debug Mode
  - 1-3: Predefined Levels
