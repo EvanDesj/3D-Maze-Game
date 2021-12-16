@@ -18,6 +18,7 @@ public:
     unordered_map<int, float> getHighScores();
     bool saveHighScore(int level, float score);
     bool loadLevel();
+    bool exportLevel(vector<vector<int>> level);
     void reset();
 };
 

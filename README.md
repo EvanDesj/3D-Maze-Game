@@ -26,6 +26,7 @@ There is a timer that starts as soon as the board is tilted. The goal is to beat
   - [HUD](#hud)
   - [Board Tilt Based on Camera Movement](#board-tilt-based-on-camera-movement)
 - [Instructions to run](#instructions-to-run)
+  - [- E: Export current board/maze to "board.txt"](#--e-export-current-boardmaze-to-boardtxt)
 - [Development Environment](#development-environment)
 - [What's Included (Pre Prototype)](#whats-included-pre-prototype)
   - [Base Board with Tilt](#base-board-with-tilt)
@@ -68,7 +69,7 @@ There is a timer that starts as soon as the board is tilted. The goal is to beat
 > Located in [fileManager.h](utils/fileManager.h)
 - A file manager has been implemented that saves and loads the highscores for each level.
 - This enables the program to be played multiple times with saved scores even after restarting.
-- This file manager is also responsible for loading the board/game data from "board.txt" placed in root directory along with main.cpp and pressing key '5'.
+- This file manager is also responsible for loading/saving the board/game data from "board.txt" placed in root directory along with main.cpp and pressing key '5'.
 - Use https://3gc3.anantj.repl.co/ to visualize and generate the board.txt file.
   
 ## High Score
@@ -129,8 +130,8 @@ Use the following keys for interaction:
  - 0: Toggle Debug Mode
  - 1-3: Predefined Levels
  - 4: Random Automatically Generated Maze
- - 5: Board/Maze loaded from "board.txt"
-  
+ - 5: Load Board/Maze from "board.txt"
+ - E: Export current board/maze to "board.txt"
 ---
 # Development Environment
 - Ubuntu 21.04 64-bit running on Virtualbox, Microsoft Windows 10

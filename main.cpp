@@ -519,6 +519,18 @@ void keyboard(unsigned char key, int x, int y)
             cout << "Please place a file in root directory titled board.txt. Refer to readme for more information." << endl;
         }
         break;
+    case 'e':
+    case 'E':
+        if (fileManager.exportLevel(Wall))
+        {
+            cout << "Board saved as board.txt" << endl;
+        }
+        else
+        {
+            consoleWarning = true;
+            cout << "Board could not be saved. Please try again later" << endl;
+        }
+        break;
     case '0':
         debugMode = !debugMode;
         break;

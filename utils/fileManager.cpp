@@ -29,6 +29,37 @@ bool FileManager::saveHighScore(int level, float score)
     return true;
 }
 
+bool FileManager::exportLevel(vector<vector<int>> level)
+{
+    ofstream MyFile("board.txt");
+    if (MyFile.fail())
+    {
+        return false;
+    }
+    MyFile << "{";
+    for (size_t x = 0; x < level.size(); x++)
+    {
+        vector<int> i = level[x];
+        MyFile << "{";
+        for (size_t j = 0; j < i.size(); j++)
+        {
+            MyFile << i[j];
+            if (j != i.size() - 1)
+            {
+                MyFile << ",";
+            }
+        }
+        MyFile << "}";
+        if (x != level.size() - 1)
+        {
+            MyFile << ",";
+        }
+    }
+    MyFile << "}";
+    MyFile.close();
+    return true;
+}
+
 unordered_map<int, float> FileManager::getHighScores()
 {
     string myText;
