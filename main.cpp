@@ -285,6 +285,7 @@ void screenText()
         renderText(10, windowHeight - 175, "Allowed | Left: " + boolToText(allowedLeft()) + " , Right: " + boolToText(allowedRight()) + " , Up: " + boolToText(allowedUp()) + " , Down: " + boolToText(allowedDown()));
         renderText(10, windowHeight - 200, "Ball Position | X: " + to_string(football.position.x) + " , Y: " + to_string(football.position.y) + " , Z: " + to_string(football.position.z));
         renderText(10, windowHeight - 225, "Tilt | X: " + to_string(xIncr) + " , Y: " + to_string(yIncr) + " , Z: " + to_string(zIncr));
+        renderText(10, windowHeight - 250, "Camera | X: " + to_string(camera.getX()) + " , Y: " + to_string(camera.getY()) + " , Z: " + to_string(camera.getZ()));
     }
     if (highScores[selectedLevel] != 0)
     {
