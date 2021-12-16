@@ -27,7 +27,6 @@ There is a timer that starts as soon as the board is tilted. The goal is to beat
   - [Winning Condition](#winning-condition)
   - [Board Tilt Based on Camera Movement](#board-tilt-based-on-camera-movement)
 - [Instructions to run](#instructions-to-run)
-  - [- E: Export current board/maze to "board.txt"](#--e-export-current-boardmaze-to-boardtxt)
 - [Development Environment](#development-environment)
 - [What's Included (Pre Prototype)](#whats-included-pre-prototype)
   - [Base Board with Tilt](#base-board-with-tilt)
@@ -137,6 +136,7 @@ Use the following keys for interaction:
  - 4: Random Automatically Generated Maze
  - 5: Load Board/Maze from "board.txt"
  - E: Export current board/maze to "board.txt"
+  
 ---
 # Development Environment
 - Ubuntu 21.04 64-bit running on Virtualbox, Microsoft Windows 10
