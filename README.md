@@ -1,4 +1,4 @@
-# 3GC3 Final Project (Fall 2021)
+**3GC3 Final Project (Fall 2021)**
 
 Authors:
 > Anant Jain, jaina17@mcmaster.ca  
@@ -7,26 +7,106 @@ Authors:
 > Lin Rozenszajn, rozensl@mcmaster.ca
 
 ---
-This project repository contains a program that renders a 3D labyrinth that can be tilted on a fixed axis. There is a ball on the board, which needs to be navigated throughout the maze in order to complete the challenge.  
+This project repository contains a program that renders a 3D labyrinth that can be tilted on a fixed axis. There is a ball on the board, which needs to be navigated throughout the maze in order to complete the challenge.
+
+There is a timer that starts as soon as the board is tilted. The goal is to beat the highscore (lowest time taken). The timer stops when the ball has escaped the maze.   
 
 ---
-
-Table of Contents:
-  - [Instructions to run](#instructions-to-run)
-  - [Development Environment](#development-environment)
-  - [What's Included](#whats-included)
-    - [Base Board with Tilt](#base-board-with-tilt)
-    - [.OBJ Loader](#obj-loader)
-    - [Mesh Renderer](#mesh-renderer)
-    - [Camera controls](#camera-controls)
-    - [Ball](#ball)
-    - [Walls/Maze](#wallsmaze)
-    - [Collision Detection](#collision-detection)
-  - [Identified Bugs](#identified-bugs)
-  - [What's Next](#whats-next)
-  - [Citations](#citations)
+- [Post Prototype Updates:](#post-prototype-updates)
+  - [Texture](#texture)
+  - [Base Board](#base-board)
+  - [Autotilt](#autotilt)
+  - [Automated Maze Generation](#automated-maze-generation)
+  - [File Manager](#file-manager)
+  - [High Score](#high-score)
+  - [Debug Mode](#debug-mode)
+  - [Lighting](#lighting)
+  - [Updated Collision Detection](#updated-collision-detection)
+  - [Web Application for Board Management](#web-application-for-board-management)
+  - [HUD](#hud)
+  - [Board Tilt Based on Camera Movement](#board-tilt-based-on-camera-movement)
+- [Instructions to run](#instructions-to-run)
+- [Development Environment](#development-environment)
+- [What's Included (Pre Prototype)](#whats-included-pre-prototype)
+  - [Base Board with Tilt](#base-board-with-tilt)
+  - [.OBJ Loader](#obj-loader)
+  - [Mesh Renderer](#mesh-renderer)
+  - [Camera controls](#camera-controls)
+  - [Ball](#ball)
+  - [Walls/Maze](#wallsmaze)
+  - [Collision Detection](#collision-detection)
+- [Identified Bugs](#identified-bugs)
+- [Citations](#citations)
 ---
-## Instructions to run
+
+# Post Prototype Updates:
+## Texture
+> Textures are located in the assets directory.  
+> [PPM Loader](utils/PPM.h) is used to load the textures.
+- Texture has been added to the floor and walls.
+- Football texture is loaded via the [football.mtl](assets/football.mtl) file via the [Obj Loader](utils/objectLoader.h) as implemented in Prototype.
+- Walls, Floor and HUD textures are loaded via PPM Loader.
+
+## Base Board
+> Located in [board.h](board.h)
+- Base board has been updated as a singular cube entity instead of multiple cubes. This was done to support edge to edge textures instead of repeating textures.
+- Dynamic sizing has also been implemented. Boards of any size (should have the same height and width) can be created and used dynamically without any changes in the code.
+   
+## Autotilt
+> Located as [autoTilt()](main.cpp)  in main.cpp
+- Slowly brings base/floor back to the original position to stop the ball from constant movement.
+- This also increases the level of challenge for the game.
+   
+## Automated Maze Generation
+> Located in [mazeGen.h](utils/mazeGen.h)
+- Automated random maze/labyrinth generation.
+- This is done by using a recursive backtracking depth first search algorithm.
+- Code from [StackOverflow](https://codereview.stackexchange.com/q/135443) has been borrowed with minor modifications.
+- Generated Maze can be played with by pressing the '4' key.
+  
+## File Manager
+> Located in [fileManager.h](utils/fileManager.h)
+- A file manager has been implemented that saves and loads the highscores for each level.
+- This enables the program to be played multiple times with saved scores even after restarting.
+- This file manager is also responsible for loading the board/game data from "board.txt" placed in root directory along with main.cpp and pressing key '5'.
+- Use https://3gc3.anantj.repl.co/ to visualize and generate the board.txt file.
+  
+## High Score
+> Located in [animate() method](main.cpp) in main.cpp
+- Using the file manager, a high score (lowest time taken to complete the game) is saved and loaded for each level.
+- This is done automatically in the background without any need for user interaction.
+- This data is saved in a file called "save.txt" placed in root directory.
+  
+## Debug Mode
+- Pressing '0' will enable debug mode which will print useful information on the screen, such as ball's position, board tilt, ball's allowed movement, camera's position, etc.
+
+## Lighting
+> Located in [main.cpp](main.cpp)
+- Lighting and shadows have been implemented.
+  
+## Updated Collision Detection
+> Located in [updateBallPosition() method](main.cpp) in main.cpp
+- A new collision detected algorithm has been implemented.
+- This algorithm is more accurate and more efficient than the previous one used for the prototype.
+- In this routine, we verify the directions the ball is able to move in based on the current position of the ball and the immidiate walls next to it.
+- This also fixes the bug where the ball would clip through walls if the tilt was greater than 15 degrees.
+  
+## Web Application for Board Management 
+> Located in [website](website/index.html)
+- A web application has been implemented that enables user to visualize, generate, upload and download custome boards.
+- This application is accessible at : https://3gc3.anantj.repl.co/
+## HUD
+> Located in [HUD.h](HUD.h)
+- A base Heads Up Display has been added to the application.
+- This display shows the basic controls, as well as the target score and current score
+  
+## Board Tilt Based on Camera Movement
+- The board now tilts based on camera's position.
+- This means that pressing 'A' will always tilt the board left relative to the user's position and so on.
+- This was done by casting a ray from the camera to the board origin, then computin tilt values based on this ray's normals.
+   
+---
+# Instructions to run
 Download all the files in this directory.
 ```
 sudo apt-get update
@@ -35,16 +115,31 @@ sudo apt-get update
 sudo apt-get install freeglut3 freeglut3-dev gcc g++ make
 ```
 ```
-make clean && make
+make && make clean
 ```
+
+Use the following keys for interaction:
+ - W, A, S, D : Board tilt
+ - Up, Down, Left, Right Arrow: Camera movement
+ - U: Camera Zoom In
+ - J: Camera Zoom Out
+ - C: Camera Reset
+ - R: Reset Game
+ - Q: Quit
+ - 0: Toggle Debug Mode
+ - 1-3: Predefined Levels
+ - 4: Random Automatically Generated Maze
+ - 5: Board/Maze loaded from "board.txt"
+  
 ---
-## Development Environment
+# Development Environment
 - Ubuntu 21.04 64-bit running on Virtualbox, Microsoft Windows 10
 - IDE : Visual Studio with C/C++ Extension
+  
 ---
 
-## What's Included
-### Base Board with Tilt
+# What's Included (Pre Prototype)
+## Base Board with Tilt
 > Located in [Board Class](board.h)
 
 The board is drawn in [main.cpp](main.cpp) based on **baseSize** defined at the beginning of the program.
@@ -53,7 +148,7 @@ The board is redrawn on every animation cycle, with it's rotation/incline manage
 
 The board can be tilted by using the **W**, **A**, **S**, **D** keys.
 
-### .OBJ Loader
+## .OBJ Loader
 A .obj object loader has been implemented with the help of the [OBJ-Loader](https://github.com/Bly7/OBJ-Loader) library.
 
 This library was chosen because:
@@ -63,7 +158,7 @@ This library was chosen because:
 -  Support for **.mtl** files which can introduce material properties (lighting, colors, etc) while importing the object.
 - It is extremely easy to use, with all the raw data available as needed, and this data is used by the **Mesh Renderer** to render the object. 
 
-### Mesh Renderer
+## Mesh Renderer
 > Located in [main.cpp as drawFromObj()](main.cpp)
 
 This rendered uses data obtained from the .obj loader, and uses it to render the object on the display.
@@ -73,7 +168,7 @@ The implementation of this renderer has been inspired from:
  - [.obj loader's examples](https://github.com/Bly7/OBJ-Loader/blob/master/examples/1%20-%20LoadAndPrint/e1_loadandprint.cpp) for instruction about obtaining the data.
  - [# Lecture 6-objects and meshes](https://avenue.cllmcmaster.ca/d2l/le/content/414625/viewContent/3401120/View) for guidance on rendering
  
- ### Camera controls
+ ## Camera controls
  > Located in [Camera class](camera.h)
 
 A camera system has been implemented that revolves around the board with variable zoom.
@@ -91,12 +186,12 @@ Movement :
 - Camera's rotation is fixed as {0,1,0} (upright on y axis).
 - Camera is always focus on/looking at the origin {0,0,0}.
 
-### Ball
+## Ball
 > Located in [Ball class](shapes/ball.h)
 
 This is the ball that is placed on the board, and it moves and rotates as the board is tilted. This class contains information about the position, rotation and speed of the ball, while the material, color and other visual properties are loaded in via the .obj loader.
 
-### Walls/Maze
+## Walls/Maze
 > Located in [main.cpp](main.cpp)
 
 - The walls are represented as a 2D Matrix. 
@@ -104,7 +199,7 @@ This is the ball that is placed on the board, and it moves and rotates as the bo
 - This wall is re-rendered on every animation cycle, on top of the base matrix which contains the board. This has been implemented this way because the walls also need to rotate as the base board rotates, otherwise clipping will occur.
 - The wall/maze is rendered via the **renderWalls()** method. For each **1** present in the **Wall** matrix, a solid cube of size 1 is rendered at it's location.
 
-### Collision Detection
+## Collision Detection
 > Located in [main.cpp](main.cpp)
 
 A basic collision detection algorithm has been implemented. This algorithm is run on every animation cycle.
@@ -118,18 +213,10 @@ The way this works is:
 
 Since we are only computing the expected position of the ball and then checking if a wall exists at that location, this is a constant time operation and it's time complexity is O(1).  
 
-## Identified Bugs
-- The ball clips through the walls if the tilt is too much, eventually breaking the game and requiring a restart.
-
-## What's Next
-- Lighting 
-- Winning Conditions
-- New Levels
-- Advanced Ball Physics (Inertia and Momentum)
-- Code cleanup and restructure
-- Other features
+# Identified Bugs
+- [x] ~~The ball clips through the walls if the tilt is too much, eventually breaking the game and requiring a restart.~~  
   
-## Citations
+# Citations
 - **.OBJ Loader** : https://github.com/Bly7/OBJ-Loader 
 	- Used as is without modifications
 - **Ball Model** : https://free3d.com/3d-model/football-ball--64059.html 
@@ -137,3 +224,6 @@ Since we are only computing the expected position of the ball and then checking 
 	- .mtl file added manually 
 - **Lecture Slides** : https://avenue.cllmcmaster.ca/d2l/le/content/414625/viewContent/3401120/View
 - **Maze Generation Algorithm** : https://codereview.stackexchange.com/q/135443
+  - Used with modifications and minor improvements 
+- **PPM Loader** : Taken from lectures and tutorial code
+   - Used as is without modifications  
